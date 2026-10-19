@@ -17,23 +17,43 @@ function LoginForm() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const res = await signIn('credentials', { username, password, redirect: false });
+    // trim: toleran spasi nyasar dari keyboard HP
+    const res = await signIn('credentials', {
+      username: username.trim(),
+      password: password.trim(),
+      redirect: false,
+    });
     setLoading(false);
-    if (res?.error) setError('Username atau password salah');
+    if (res?.error) {
+      setError('Username atau password salah. Cek lagi pelan-pelan ya.');
+    } else {
+      window.location.href = '/admin';
+    }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-sm animate-fade-up">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-slate-950">
+      {/* dekorasi */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl" />
+      <div
+        className="absolute inset-0 opacity-[0.15]"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.4) 1px, transparent 0)',
+          backgroundSize: '28px 28px',
+        }}
+      />
+
+      <div className="w-full max-w-sm relative animate-fade-up">
         <div className="text-center mb-8">
-          <span className="inline-flex w-16 h-16 rounded-3xl bg-amber-400 text-slate-900 items-center justify-center mb-4">
+          <span className="inline-flex w-16 h-16 rounded-3xl bg-amber-400 text-slate-950 items-center justify-center mb-4 shadow-lg shadow-amber-500/30">
             <BoxIcon className="w-8 h-8" />
           </span>
-          <p className="text-[11px] font-extrabold tracking-[0.25em] text-amber-400 uppercase">Admin</p>
-          <h1 className="text-2xl font-extrabold text-white mt-1">Stok Gudang</h1>
+          <p className="text-[11px] font-extrabold tracking-[0.25em] text-amber-400 uppercase">Stok Gudang</p>
+          <h1 className="text-2xl font-extrabold text-white mt-1">Panel Admin</h1>
           <p className="text-slate-400 text-sm mt-1">Masuk untuk mengelola gudang</p>
         </div>
-        <form onSubmit={submit} className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl">
+        <form onSubmit={submit} className="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl">
           {error && (
             <div className="mb-4 bg-red-50 border border-red-100 text-red-700 text-sm font-bold rounded-2xl px-4 py-3">
               {error}
@@ -45,6 +65,7 @@ function LoginForm() {
             <input
               value={username} onChange={(e) => setUsername(e.target.value)} autoFocus
               placeholder="username" autoComplete="username"
+              autoCapitalize="off" autoCorrect="off" spellCheck={false}
               className="w-full border border-slate-200 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-semibold outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition"
             />
           </div>
@@ -64,7 +85,7 @@ function LoginForm() {
           </div>
           <button
             type="submit" disabled={loading}
-            className="w-full bg-slate-900 text-white font-extrabold rounded-2xl py-4 hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-60"
+            className="w-full bg-slate-900 text-white font-extrabold rounded-2xl py-4 hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-60 shadow-lg"
           >
             {loading ? 'Masuk...' : 'Masuk'}
           </button>
