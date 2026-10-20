@@ -43,9 +43,14 @@ export default function BarangDetail({ params }) {
       {/* info barang */}
       <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6 mb-5">
         <div className="flex items-start gap-4">
-          <span className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
-            <BoxIcon className="w-7 h-7" />
-          </span>
+          {item.image ? (
+            <img src={item.image} alt={item.name}
+              className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+          ) : (
+            <span className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+              <BoxIcon className="w-7 h-7" />
+            </span>
+          )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-xl sm:text-2xl font-extrabold">{item.name}</h1>

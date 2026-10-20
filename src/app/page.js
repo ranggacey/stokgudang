@@ -196,11 +196,16 @@ export default function PublicCatalog() {
                     isEmpty ? 'opacity-80' : ''
                   }`}
                 >
-                  <span className={`w-13 h-13 p-3.5 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                    isEmpty ? 'bg-slate-100 text-slate-400' : st === 'low' ? 'bg-amber-100 text-amber-700' : 'bg-slate-900 text-amber-400'
-                  }`}>
-                    <BoxIcon className="w-6 h-6" />
-                  </span>
+                  {item.image ? (
+                    <img src={item.image} alt={item.name}
+                      className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+                  ) : (
+                    <span className={`p-3.5 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                      isEmpty ? 'bg-slate-100 text-slate-400' : st === 'low' ? 'bg-amber-100 text-amber-700' : 'bg-slate-900 text-amber-400'
+                    }`}>
+                      <BoxIcon className="w-6 h-6" />
+                    </span>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-extrabold truncate text-[15px]">{item.name}</h3>
                     <p className="text-[11px] text-slate-400 font-mono mt-0.5">{item.sku} · {item.category}</p>

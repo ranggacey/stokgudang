@@ -9,6 +9,7 @@ const ItemSchema = new mongoose.Schema(
     location: { type: String, trim: true, default: '' },
     stock: { type: Number, required: true, default: 0, min: 0 },
     minStock: { type: Number, required: true, default: 0, min: 0 },
+    image: { type: String, trim: true, default: '' },
   },
   { timestamps: true }
 );

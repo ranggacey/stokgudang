@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   BoxIcon, SearchIcon, PlusIcon, MinusIcon, AdjustIcon,
-  EditIcon, TrashIcon, CloseIcon, AlertIcon,
+  EditIcon, TrashIcon, CloseIcon, AlertIcon, CameraIcon,
 } from '@/components/icons';
 import { stockStatus, StatusBadge } from '@/components/badges';
 
@@ -50,7 +50,7 @@ function Modal({ onClose, children, title }) {
   );
 }
 
-const EMPTY_FORM = { name: '', sku: '', category: '', unit: 'pcs', location: '', minStock: 0, initialStock: 0 };
+const EMPTY_FORM = { name: '', sku: '', category: '', unit: 'pcs', location: '', minStock: 0, initialStock: 0, image: '' };
 
 export default function BarangPage() {
   const [items, setItems] = useState([]);
@@ -78,6 +78,10 @@ export default function BarangPage() {
 
   const [page, setPage] = useState(1);
   const PER_PAGE = 8;
+
+  const [imageFile, setImageFile] = useState(null);
+  const [imageUploading, setImageUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => { setPage(1); }, [q, category, sort, status]);
 
@@ -109,6 +113,7 @@ export default function BarangPage() {
     setEditing(null);
     setForm(EMPTY_FORM);
     setFormErrors({});
+    setImageFile(null);
     setShowForm(true);
   }
 
@@ -117,8 +122,10 @@ export default function BarangPage() {
     setForm({
       name: item.name, sku: item.sku, category: item.category,
       unit: item.unit, location: item.location || '', minStock: item.minStock,
+      image: item.image || '', initialStock: 0,
     });
     setFormErrors({});
+    setImageFile(null);
     setShowForm(true);
   }
 
@@ -127,11 +134,25 @@ export default function BarangPage() {
     setFormLoading(true);
     setFormErrors({});
     try {
+      let imageUrl = form.image || '';
+      if (imageFile) {
+        setImageUploading(true);
+        const fd = new FormData();
+        fd.append('file', imageFile);
+        const up = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+        const ud = await up.json();
+        setImageUploading(false);
+        if (!up.ok) {
+          setFormErrors({ _global: ud.message || 'Gagal mengupload foto' });
+          return;
+        }
+        imageUrl = ud.url;
+      }
       const url = editing ? `/api/admin/items/${editing._id}` : '/api/admin/items';
       const r = await fetch(url, {
         method: editing ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, minStock: Number(form.minStock) }),
+        body: JSON.stringify({ ...form, minStock: Number(form.minStock), image: imageUrl }),
       });
       const d = await r.json();
       if (!r.ok) {
@@ -153,6 +174,7 @@ export default function BarangPage() {
       setFormErrors({ _global: 'Terjadi kesalahan. Coba lagi.' });
     } finally {
       setFormLoading(false);
+      setImageUploading(false);
     }
   }
 
@@ -272,9 +294,14 @@ export default function BarangPage() {
               return (
                 <div key={item._id} className="bg-white rounded-3xl border border-slate-100 p-4">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
-                      <BoxIcon className="w-5 h-5" />
-                    </span>
+                    {item.image ? (
+                      <img src={item.image} alt={item.name}
+                        className="w-11 h-11 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+                    ) : (
+                      <span className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                        <BoxIcon className="w-5 h-5" />
+                      </span>
+                    )}
                     <div className="flex-1 min-w-0">
                       <p className="font-extrabold truncate">{item.name}</p>
                       <p className="text-xs text-slate-400 font-mono">{item.sku} · {item.category}</p>
@@ -332,8 +359,20 @@ export default function BarangPage() {
                   return (
                     <tr key={item._id} className="hover:bg-slate-50/60">
                       <td className="px-5 py-4">
-                        <Link href={`/admin/barang/${item._id}`} className="font-extrabold hover:text-amber-600 transition-colors">{item.name}</Link>
-                        <p className="text-xs text-slate-400 font-mono">{item.sku}{item.location ? ` · Rak ${item.location}` : ''}</p>
+                        <div className="flex items-center gap-3">
+                          {item.image ? (
+                            <img src={item.image} alt={item.name}
+                              className="w-10 h-10 rounded-xl object-cover flex-shrink-0 border border-slate-100" />
+                          ) : (
+                            <span className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                              <BoxIcon className="w-4 h-4" />
+                            </span>
+                          )}
+                          <div className="min-w-0">
+                            <Link href={`/admin/barang/${item._id}`} className="font-extrabold hover:text-amber-600 transition-colors">{item.name}</Link>
+                            <p className="text-xs text-slate-400 font-mono">{item.sku}{item.location ? ` · Rak ${item.location}` : ''}</p>
+                          </div>
+                        </div>
                       </td>
                       <td className="px-5 py-4 text-slate-500 font-semibold">{item.category}</td>
                       <td className="px-5 py-4 text-right font-extrabold tabular-nums">{item.stock} <span className="text-xs text-slate-400 font-bold">{item.unit}</span></td>
@@ -399,6 +438,42 @@ export default function BarangPage() {
             <div>
               <p className="text-[11px] font-extrabold tracking-[0.18em] text-amber-600 uppercase mb-3">Info barang</p>
               <div className="space-y-4">
+                {/* foto barang */}
+                <div className="flex items-center gap-4">
+                  <button type="button" onClick={() => fileInputRef.current?.click()}
+                    className="w-20 h-20 rounded-3xl bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-amber-400 transition">
+                    {(imageFile || form.image) ? (
+                      <img
+                        src={imageFile ? URL.createObjectURL(imageFile) : form.image}
+                        alt="Foto barang"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-slate-400 flex flex-col items-center gap-1">
+                        <CameraIcon className="w-6 h-6" />
+                        <span className="text-[9px] font-extrabold uppercase tracking-wide">Foto</span>
+                      </span>
+                    )}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-extrabold">Foto barang <span className="text-slate-400 font-semibold">(opsional)</span></p>
+                    <p className="text-xs text-slate-400 font-semibold mt-0.5">JPG/PNG, maks 5MB. Muncul di katalog publik.</p>
+                    <div className="flex gap-2 mt-2">
+                      <button type="button" onClick={() => fileInputRef.current?.click()}
+                        className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold hover:bg-slate-800 transition">
+                        {imageFile || form.image ? 'Ganti foto' : 'Pilih foto'}
+                      </button>
+                      {(imageFile || form.image) && (
+                        <button type="button" onClick={() => { setImageFile(null); setForm({ ...form, image: '' }); }}
+                          className="px-3.5 py-2 rounded-xl bg-red-50 text-red-600 text-xs font-extrabold hover:bg-red-100 transition">
+                          Hapus
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+                    onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
+                </div>
                 <div>
                   <label className={labelCls}>Nama barang *</label>
                   <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -459,7 +534,7 @@ export default function BarangPage() {
             )}
             <button type="submit" disabled={formLoading}
               className="w-full bg-slate-900 text-white font-extrabold rounded-2xl py-4 hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-60 shadow-lg">
-              {formLoading ? 'Menyimpan...' : editing ? 'Simpan Perubahan' : 'Tambah Barang'}
+              {formLoading ? (imageUploading ? 'Mengupload foto...' : 'Menyimpan...') : editing ? 'Simpan Perubahan' : 'Tambah Barang'}
             </button>
           </form>
         </Modal>

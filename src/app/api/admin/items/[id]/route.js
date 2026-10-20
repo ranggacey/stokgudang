@@ -20,6 +20,7 @@ export async function PUT(req, { params }) {
   if (data.category !== undefined) update.category = String(data.category).trim();
   if (data.unit !== undefined) update.unit = String(data.unit).trim();
   if (data.location !== undefined) update.location = String(data.location).trim();
+  if (data.image !== undefined) update.image = String(data.image).trim();
   if (data.minStock !== undefined) {
     const n = Number(data.minStock);
     if (!Number.isInteger(n) || n < 0) {

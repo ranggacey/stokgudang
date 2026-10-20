@@ -25,6 +25,15 @@ export function SearchIcon({ className = '' }) {
   );
 }
 
+export function CameraIcon({ className = '' }) {
+  return (
+    <Base className={className}>
+      <path d="M4 8h3l2-2.5h6L17 8h3a1.5 1.5 0 011.5 1.5V18a1.5 1.5 0 01-1.5 1.5H4A1.5 1.5 0 012.5 18V9.5A1.5 1.5 0 014 8z" />
+      <circle cx="12" cy="13.5" r="3.5" />
+    </Base>
+  );
+}
+
 export function PlusIcon({ className = '' }) {
   return (
     <Base className={className}>

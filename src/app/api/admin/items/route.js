@@ -38,6 +38,7 @@ export async function POST(req) {
       unit: String(data.unit || 'pcs').trim(),
       location: String(data.location || '').trim(),
       minStock: Number(data.minStock || 0),
+      image: data.image ? String(data.image).trim() : '',
       stock: 0,
     });
     return Response.json({ item }, { status: 201 });
