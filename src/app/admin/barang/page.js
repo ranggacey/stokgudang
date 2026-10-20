@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BoxIcon, SearchIcon, PlusIcon, MinusIcon, AdjustIcon,
-  EditIcon, TrashIcon, CloseIcon, AlertIcon, CameraIcon,
+  EditIcon, TrashIcon, CloseIcon, AlertIcon,
 } from '@/components/icons';
 import { stockStatus, StatusBadge } from '@/components/badges';
+import ItemForm from '@/components/ItemForm';
 
 const SORTS = [
   { v: 'name_asc', label: 'Nama A–Z' },
@@ -15,7 +16,6 @@ const SORTS = [
   { v: 'stock_asc', label: 'Stok tersedikit' },
 ];
 
-const UNITS = ['pcs', 'box', 'dus', 'kg', 'liter', 'meter', 'pak', 'set'];
 
 function Stepper({ value, onChange }) {
   return (
@@ -50,7 +50,6 @@ function Modal({ onClose, children, title }) {
   );
 }
 
-const EMPTY_FORM = { name: '', sku: '', category: '', unit: 'pcs', location: '', minStock: 0, initialStock: 0, image: '' };
 
 export default function BarangPage() {
   const [items, setItems] = useState([]);
@@ -61,11 +60,7 @@ export default function BarangPage() {
   const [sort, setSort] = useState('name_asc');
   const [status, setStatus] = useState('');
 
-  const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [formErrors, setFormErrors] = useState({});
-  const [formLoading, setFormLoading] = useState(false);
 
   const [trxItem, setTrxItem] = useState(null);
   const [trxType, setTrxType] = useState('in');
@@ -79,13 +74,14 @@ export default function BarangPage() {
   const [page, setPage] = useState(1);
   const PER_PAGE = 8;
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imageUploading, setImageUploading] = useState(false);
-  const fileInputRef = useRef(null);
 
   useEffect(() => { setPage(1); }, [q, category, sort, status]);
 
   useEffect(() => {
+    try {
+      const msg = sessionStorage.getItem('barang_toast');
+      if (msg) { setToast(msg); sessionStorage.removeItem('barang_toast'); }
+    } catch {}
     const t = setTimeout(fetchItems, 300);
     return () => clearTimeout(t);
   }, [q, category, sort, status]);
@@ -107,75 +103,6 @@ export default function BarangPage() {
       setCategories(d.categories || []);
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
-  }
-
-  function openAdd() {
-    setEditing(null);
-    setForm(EMPTY_FORM);
-    setFormErrors({});
-    setImageFile(null);
-    setShowForm(true);
-  }
-
-  function openEdit(item) {
-    setEditing(item);
-    setForm({
-      name: item.name, sku: item.sku, category: item.category,
-      unit: item.unit, location: item.location || '', minStock: item.minStock,
-      image: item.image || '', initialStock: 0,
-    });
-    setFormErrors({});
-    setImageFile(null);
-    setShowForm(true);
-  }
-
-  async function submitForm(e) {
-    e.preventDefault();
-    setFormLoading(true);
-    setFormErrors({});
-    try {
-      let imageUrl = form.image || '';
-      if (imageFile) {
-        setImageUploading(true);
-        const fd = new FormData();
-        fd.append('file', imageFile);
-        const up = await fetch('/api/admin/upload', { method: 'POST', body: fd });
-        const ud = await up.json();
-        setImageUploading(false);
-        if (!up.ok) {
-          setFormErrors({ _global: ud.message || 'Gagal mengupload foto' });
-          return;
-        }
-        imageUrl = ud.url;
-      }
-      const url = editing ? `/api/admin/items/${editing._id}` : '/api/admin/items';
-      const r = await fetch(url, {
-        method: editing ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, minStock: Number(form.minStock), image: imageUrl }),
-      });
-      const d = await r.json();
-      if (!r.ok) {
-        setFormErrors(d.errors || {});
-        if (d.message && !d.errors) setFormErrors({ _global: d.message });
-        return;
-      }
-      if (!editing && Number(form.initialStock) > 0 && d.item?._id) {
-        await fetch('/api/admin/transactions', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ itemId: d.item._id, type: 'in', qty: Number(form.initialStock), note: 'Stok awal' }),
-        });
-      }
-      setShowForm(false);
-      setToast(editing ? 'Barang diperbarui' : `Barang ditambahkan${Number(form.initialStock) > 0 ? ` dengan stok awal ${form.initialStock}` : ''}.`);
-      fetchItems();
-    } catch (e) {
-      setFormErrors({ _global: 'Terjadi kesalahan. Coba lagi.' });
-    } finally {
-      setFormLoading(false);
-      setImageUploading(false);
-    }
   }
 
   async function deleteItem(item) {
@@ -247,11 +174,11 @@ export default function BarangPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold mt-1">Barang</h1>
           <p className="text-sm text-slate-500 mt-1.5">{items.length} jenis barang</p>
         </div>
-        <button onClick={openAdd}
+        <Link href="/admin/barang/tambah"
           className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white text-sm font-extrabold hover:bg-slate-800 active:scale-95 transition">
           <PlusIcon className="w-4 h-4" />
           Tambah Barang
-        </button>
+        </Link>
       </div>
 
       {/* filter */}
@@ -281,9 +208,9 @@ export default function BarangPage() {
         <div className="bg-white rounded-3xl border border-slate-100 p-12 text-center">
           <BoxIcon className="w-12 h-12 mx-auto text-slate-200 mb-3" />
           <p className="font-bold text-slate-500">Belum ada barang</p>
-          <button onClick={openAdd} className="mt-4 px-5 py-2.5 rounded-2xl bg-slate-900 text-white text-sm font-extrabold">
+          <Link href="/admin/barang/tambah" className="mt-4 inline-block px-5 py-2.5 rounded-2xl bg-slate-900 text-white text-sm font-extrabold">
             Tambah barang pertama
-          </button>
+          </Link>
         </div>
       ) : (
         <>
@@ -331,7 +258,7 @@ export default function BarangPage() {
                       className="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-extrabold">
                       Detail & Riwayat
                     </Link>
-                    <button onClick={() => openEdit(item)} aria-label="Edit"
+                    <button onClick={() => setEditing(item)} aria-label="Edit"
                       className="p-2 rounded-xl bg-slate-100 text-slate-600"><EditIcon className="w-4 h-4" /></button>
                     <button onClick={() => deleteItem(item)} aria-label="Hapus"
                       className="p-2 rounded-xl bg-slate-100 text-slate-600"><TrashIcon className="w-4 h-4" /></button>
@@ -385,7 +312,7 @@ export default function BarangPage() {
                             className="p-2 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 transition"><MinusIcon className="w-4 h-4" /></button>
                           <button onClick={() => openTrx(item, 'adjust')} title="Opname / penyesuaian"
                             className="p-2 rounded-xl bg-amber-100 text-amber-700 hover:bg-amber-200 transition"><AdjustIcon className="w-4 h-4" /></button>
-                          <button onClick={() => openEdit(item)} title="Edit"
+                          <button onClick={() => setEditing(item)} title="Edit"
                             className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition"><EditIcon className="w-4 h-4" /></button>
                           <button onClick={() => deleteItem(item)} title="Hapus"
                             className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition"><TrashIcon className="w-4 h-4" /></button>
@@ -427,116 +354,20 @@ export default function BarangPage() {
         </>
       )}
 
-      {/* modal tambah/edit */}
-      {showForm && (
-        <Modal onClose={() => setShowForm(false)} title={editing ? 'Edit Barang' : 'Tambah Barang'}>
-          <form onSubmit={submitForm} className="space-y-5">
-            {formErrors._global && (
-              <div className="bg-red-50 border border-red-100 text-red-700 text-sm font-bold rounded-2xl px-4 py-3">{formErrors._global}</div>
-            )}
-            {/* info barang */}
-            <div>
-              <p className="text-[11px] font-extrabold tracking-[0.18em] text-amber-600 uppercase mb-3">Info barang</p>
-              <div className="space-y-4">
-                {/* foto barang */}
-                <div className="flex items-center gap-4">
-                  <button type="button" onClick={() => fileInputRef.current?.click()}
-                    className="w-20 h-20 rounded-3xl bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-amber-400 transition">
-                    {(imageFile || form.image) ? (
-                      <img
-                        src={imageFile ? URL.createObjectURL(imageFile) : form.image}
-                        alt="Foto barang"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-slate-400 flex flex-col items-center gap-1">
-                        <CameraIcon className="w-6 h-6" />
-                        <span className="text-[9px] font-extrabold uppercase tracking-wide">Foto</span>
-                      </span>
-                    )}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-extrabold">Foto barang <span className="text-slate-400 font-semibold">(opsional)</span></p>
-                    <p className="text-xs text-slate-400 font-semibold mt-0.5">JPG/PNG, maks 5MB. Muncul di katalog publik.</p>
-                    <div className="flex gap-2 mt-2">
-                      <button type="button" onClick={() => fileInputRef.current?.click()}
-                        className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold hover:bg-slate-800 transition">
-                        {imageFile || form.image ? 'Ganti foto' : 'Pilih foto'}
-                      </button>
-                      {(imageFile || form.image) && (
-                        <button type="button" onClick={() => { setImageFile(null); setForm({ ...form, image: '' }); }}
-                          className="px-3.5 py-2 rounded-xl bg-red-50 text-red-600 text-xs font-extrabold hover:bg-red-100 transition">
-                          Hapus
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
-                    onChange={(e) => setImageFile(e.target.files?.[0] || null)} />
-                </div>
-                <div>
-                  <label className={labelCls}>Nama barang *</label>
-                  <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="cth: Kardus Packing Besar" className={inputCls} />
-                  {formErrors.name && <p className="text-red-600 text-xs font-bold mt-1">{formErrors.name}</p>}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className={labelCls}>Kode / SKU *</label>
-                    <input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                      placeholder="cth: KRD-001" className={`${inputCls} font-mono uppercase`} />
-                    {formErrors.sku && <p className="text-red-600 text-xs font-bold mt-1">{formErrors.sku}</p>}
-                  </div>
-                  <div>
-                    <label className={labelCls}>Kategori *</label>
-                    <input value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-                      placeholder="cth: Packing" list="catlist" className={inputCls} />
-                    <datalist id="catlist">{categories.map((c) => <option key={c} value={c} />)}</datalist>
-                    {formErrors.category && <p className="text-red-600 text-xs font-bold mt-1">{formErrors.category}</p>}
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* stok & lokasi */}
-            <div>
-              <p className="text-[11px] font-extrabold tracking-[0.18em] text-amber-600 uppercase mb-3">Stok & lokasi</p>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className={labelCls}>Satuan</label>
-                  <select value={form.unit} onChange={(e) => setForm({ ...form, unit: e.target.value })} className={inputCls}>
-                    {UNITS.map((u) => <option key={u} value={u}>{u}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelCls}>Lokasi rak</label>
-                  <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
-                    placeholder="cth: A-12" className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Stok minimum</label>
-                  <input type="number" min="0" value={form.minStock}
-                    onChange={(e) => setForm({ ...form, minStock: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
-                    className={inputCls} />
-                  {formErrors.minStock && <p className="text-red-600 text-xs font-bold mt-1">{formErrors.minStock}</p>}
-                </div>
-              </div>
-            </div>
-            {!editing && (
-              <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-extrabold text-emerald-900">Stok awal</p>
-                    <p className="text-xs text-emerald-700/80 font-semibold mt-0.5">Otomatis tercatat sebagai transaksi masuk</p>
-                  </div>
-                  <Stepper value={form.initialStock} onChange={(v) => setForm({ ...form, initialStock: v })} />
-                </div>
-              </div>
-            )}
-            <button type="submit" disabled={formLoading}
-              className="w-full bg-slate-900 text-white font-extrabold rounded-2xl py-4 hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-60 shadow-lg">
-              {formLoading ? (imageUploading ? 'Mengupload foto...' : 'Menyimpan...') : editing ? 'Simpan Perubahan' : 'Tambah Barang'}
-            </button>
-          </form>
+      {/* modal edit barang */}
+      {editing && (
+        <Modal onClose={() => setEditing(null)} title="Edit Barang">
+          <ItemForm
+            mode="edit"
+            itemId={editing._id}
+            categories={categories}
+            initial={{
+              name: editing.name, sku: editing.sku, category: editing.category,
+              unit: editing.unit, location: editing.location || '', minStock: editing.minStock,
+              image: editing.image || '', initialStock: 0,
+            }}
+            onDone={() => { setEditing(null); setToast('Barang diperbarui'); fetchItems(); }}
+          />
         </Modal>
       )}
 
