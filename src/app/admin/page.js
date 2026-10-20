@@ -125,33 +125,36 @@ function Dashboard() {
 
   return (
     <div className="animate-fade-up">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Dashboard</h1>
-        <p className="text-sm text-slate-500 mt-1">Ringkasan kondisi gudang hari ini</p>
+      <div className="mb-7">
+        <p className="text-[11px] font-extrabold tracking-[0.25em] text-amber-600 uppercase">Panel Admin</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold mt-1">Dashboard</h1>
+        <p className="text-sm text-slate-500 mt-1.5">Ringkasan kondisi gudang hari ini</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {[
-          { label: 'Jenis barang', value: stats.totalItems, icon: <BoxIcon className="w-6 h-6" />, tone: 'bg-slate-900 text-white' },
-          { label: 'Total stok', value: stats.totalStock, icon: <CheckIcon className="w-6 h-6" />, tone: 'bg-emerald-100 text-emerald-700' },
-          { label: 'Menipis', value: stats.lowCount, icon: <AlertIcon className="w-6 h-6" />, tone: 'bg-amber-100 text-amber-700' },
-          { label: 'Habis', value: stats.emptyCount, icon: <AlertIcon className="w-6 h-6" />, tone: 'bg-red-100 text-red-700' },
+          { label: 'Jenis barang', value: stats.totalItems, icon: <BoxIcon className="w-6 h-6" />, tile: 'bg-slate-900 text-amber-400', ring: 'hover:shadow-slate-900/10' },
+          { label: 'Total stok', value: stats.totalStock, icon: <CheckIcon className="w-6 h-6" />, tile: 'bg-emerald-500 text-white', ring: 'hover:shadow-emerald-500/20' },
+          { label: 'Menipis', value: stats.lowCount, icon: <AlertIcon className="w-6 h-6" />, tile: 'bg-amber-400 text-slate-900', ring: 'hover:shadow-amber-400/30' },
+          { label: 'Habis', value: stats.emptyCount, icon: <AlertIcon className="w-6 h-6" />, tile: 'bg-red-500 text-white', ring: 'hover:shadow-red-500/20' },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-3xl border border-slate-100 p-4 sm:p-5 flex items-center gap-3">
-            <span className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${s.tone}`}>{s.icon}</span>
+          <div key={s.label} className={`bg-white rounded-3xl border border-slate-100 p-5 flex items-center gap-3.5 shadow-sm transition-shadow hover:shadow-lg ${s.ring}`}>
+            <span className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md ${s.tile}`}>{s.icon}</span>
             <div>
-              <p className="text-xl sm:text-2xl font-extrabold tabular-nums leading-none">{s.value}</p>
-              <p className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide mt-1">{s.label}</p>
+              <p className="text-2xl font-extrabold tabular-nums leading-none">{s.value}</p>
+              <p className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1.5">{s.label}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* perlu perhatian */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6 mb-6">
+      <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6 mb-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-extrabold text-lg flex items-center gap-2">
-            <AlertIcon className="w-5 h-5 text-amber-500" />
+          <h2 className="font-extrabold text-lg flex items-center gap-2.5">
+            <span className="w-9 h-9 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center">
+              <AlertIcon className="w-5 h-5" />
+            </span>
             Perlu Perhatian
           </h2>
           <Link href="/admin/barang" className="text-xs font-extrabold text-amber-600 hover:text-amber-700">
@@ -189,7 +192,7 @@ function Dashboard() {
       </div>
 
       {/* transaksi terakhir */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6">
+      <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-extrabold text-lg">Transaksi Terakhir</h2>
           <Link href="/admin/riwayat" className="text-xs font-extrabold text-amber-600 hover:text-amber-700">
