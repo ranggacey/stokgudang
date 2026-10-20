@@ -35,16 +35,16 @@ function Stepper({ value, onChange }) {
 
 function Modal({ onClose, children, title }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-white w-full sm:max-w-lg sm:rounded-3xl rounded-t-3xl max-h-[92vh] overflow-y-auto animate-pop-in">
-        <div className="sticky top-0 bg-white/95 backdrop-blur px-5 py-4 flex items-center justify-between border-b border-slate-100 rounded-t-3xl">
-          <h3 className="font-extrabold text-lg">{title}</h3>
-          <button onClick={onClose} aria-label="Tutup" className="p-2 rounded-full bg-slate-100 text-slate-600">
+      <div className="absolute inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-2xl overflow-y-auto animate-slide-in-right flex flex-col">
+        <div className="sticky top-0 bg-white/95 backdrop-blur px-6 py-5 flex items-center justify-between border-b border-slate-100 z-10">
+          <h3 className="font-extrabold text-xl">{title}</h3>
+          <button onClick={onClose} aria-label="Tutup" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
             <CloseIcon className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-5">{children}</div>
+        <div className="p-6 flex-1">{children}</div>
       </div>
     </div>
   );

@@ -16,6 +16,12 @@ body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
 }
 .animate-pop-in { animation: pop-in 0.25s ease-out both; }
 
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right { animation: slide-in-right 0.3s cubic-bezier(0.32, 0.72, 0, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up, .animate-pop-in { animation: none; }
+  .animate-fade-up, .animate-pop-in, .animate-slide-in-right { animation: none; }
 }
