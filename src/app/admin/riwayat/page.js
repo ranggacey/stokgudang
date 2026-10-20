@@ -37,8 +37,9 @@ export default function RiwayatPage() {
   return (
     <div className="animate-fade-up">
       <div className="mb-5">
-        <h1 className="text-2xl sm:text-3xl font-extrabold">Riwayat Transaksi</h1>
-        <p className="text-sm text-slate-500 mt-1">Semua pergerakan stok tercatat di sini dan tidak bisa diubah</p>
+        <p className="text-[11px] font-extrabold tracking-[0.25em] text-amber-600 uppercase">Panel Admin</p>
+        <h1 className="text-3xl sm:text-4xl font-extrabold mt-1">Riwayat Transaksi</h1>
+        <p className="text-sm text-slate-500 mt-1.5">Semua pergerakan stok tercatat di sini dan tidak bisa diubah</p>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2 mb-5">
