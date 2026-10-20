@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BoxIcon, SearchIcon, PlusIcon, MinusIcon, AdjustIcon,
-  EditIcon, TrashIcon, CloseIcon, AlertIcon,
+  EditIcon, TrashIcon, CloseIcon, AlertIcon, ArrowUpIcon, ArrowDownIcon,
 } from '@/components/icons';
 import { stockStatus, StatusBadge } from '@/components/badges';
 import ItemForm from '@/components/ItemForm';
@@ -41,6 +41,12 @@ function Stepper({ value, onChange }) {
     </div>
   );
 }
+
+const TRX_TONE = {
+  in: { chipBg: 'bg-emerald-50 text-emerald-700 border-emerald-100', chipOn: 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/30', panel: 'bg-emerald-50 border-emerald-100', badge: 'bg-emerald-500 text-white', arrow: 'text-emerald-400', btn: 'bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/30', label: 'Simpan Barang Masuk' },
+  out: { chipBg: 'bg-red-50 text-red-700 border-red-100', chipOn: 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/30', panel: 'bg-red-50 border-red-100', badge: 'bg-red-500 text-white', arrow: 'text-red-400', btn: 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30', label: 'Simpan Barang Keluar' },
+  adjust: { chipBg: 'bg-amber-50 text-amber-700 border-amber-100', chipOn: 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/30', panel: 'bg-amber-50 border-amber-100', badge: 'bg-amber-500 text-white', arrow: 'text-amber-400', btn: 'bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/30', label: 'Simpan Hasil Opname' },
+};
 
 function Modal({ onClose, children, title }) {
   return (
@@ -383,47 +389,85 @@ export default function BarangPage() {
       {/* modal transaksi */}
       {trxItem && (
         <Modal onClose={() => setTrxItem(null)} title="Catat Pergerakan Stok">
-          <div className="flex items-center gap-3 mb-5 p-4 bg-slate-50 rounded-2xl">
-            <span className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
-              <BoxIcon className="w-5 h-5" />
-            </span>
+          {/* item */}
+          <div className="flex items-center gap-3 mb-5 p-4 bg-slate-50 rounded-3xl">
+            {trxItem.image ? (
+              <img src={trxItem.image} alt={trxItem.name}
+                className="w-12 h-12 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+            ) : (
+              <span className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                <BoxIcon className="w-6 h-6" />
+              </span>
+            )}
             <div className="min-w-0">
               <p className="font-extrabold truncate">{trxItem.name}</p>
               <p className="text-xs text-slate-400">Stok saat ini: <b className="text-slate-700 tabular-nums">{trxItem.stock} {trxItem.unit}</b></p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 mb-5">
+          {/* tipe */}
+          <div className="grid grid-cols-3 gap-2.5 mb-6">
             {[
-              { v: 'in', label: 'Masuk', cls: 'bg-emerald-100 text-emerald-700', active: 'bg-emerald-500 text-white' },
-              { v: 'out', label: 'Keluar', cls: 'bg-red-100 text-red-700', active: 'bg-red-500 text-white' },
-              { v: 'adjust', label: 'Opname', cls: 'bg-amber-100 text-amber-700', active: 'bg-amber-500 text-white' },
-            ].map((t) => (
-              <button key={t.v} type="button" onClick={() => { setTrxType(t.v); setTrxQty(t.v === 'adjust' ? trxItem.stock : 1); setTrxError(''); }}
-                className={`py-3 rounded-2xl text-sm font-extrabold transition ${trxType === t.v ? t.active : t.cls}`}>
-                {t.label}
-              </button>
-            ))}
+              { v: 'in', label: 'Masuk', desc: 'Tambah stok', Icon: ArrowUpIcon },
+              { v: 'out', label: 'Keluar', desc: 'Kurangi stok', Icon: ArrowDownIcon },
+              { v: 'adjust', label: 'Opname', desc: 'Hasil hitung', Icon: AdjustIcon },
+            ].map((t) => {
+              const on = trxType === t.v;
+              return (
+                <button key={t.v} type="button" onClick={() => { setTrxType(t.v); setTrxQty(t.v === 'adjust' ? trxItem.stock : 1); setTrxError(''); }}
+                  className={`rounded-2xl border py-3.5 px-2 flex flex-col items-center gap-1 transition-all active:scale-95 ${on ? TRX_TONE[t.v].chipOn : TRX_TONE[t.v].chipBg}`}>
+                  <t.Icon className="w-6 h-6" />
+                  <span className="text-sm font-extrabold leading-none mt-0.5">{t.label}</span>
+                  <span className={`text-[10px] font-bold ${on ? 'text-white/80' : 'opacity-60'}`}>{t.desc}</span>
+                </button>
+              );
+            })}
           </div>
 
-          <label className={labelCls}>
-            {trxType === 'adjust' ? 'Hasil hitungan fisik (stok opname)' : 'Jumlah'}
-          </label>
-          <div className="mb-4"><Stepper value={trxQty} onChange={setTrxQty} /></div>
+          {/* jumlah */}
+          <p className="text-center text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.2em] mb-3">
+            {trxType === 'adjust' ? 'Hasil hitungan fisik' : trxType === 'in' ? 'Jumlah masuk' : 'Jumlah keluar'}
+          </p>
+          <div className="flex justify-center"><Stepper value={trxQty} onChange={setTrxQty} /></div>
+          {trxType !== 'adjust' ? (
+            <div className="flex justify-center gap-2 mt-3.5 mb-6">
+              {[5, 10, 50, 100].map((n) => (
+                <button key={n} type="button" onClick={() => setTrxQty((q) => q + n)}
+                  className="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-xs font-extrabold hover:bg-slate-200 active:scale-95 transition">
+                  +{n}
+                </button>
+              ))}
+            </div>
+          ) : <div className="mb-6" />}
+
+          {/* preview hasil */}
+          {(() => {
+            const pv = trxPreview();
+            if (!pv) return null;
+            const diff = pv.to - pv.from;
+            const diffLabel = diff > 0 ? `+${diff}` : diff < 0 ? `−${Math.abs(diff)}` : '0';
+            return (
+              <div className={`flex items-center justify-between rounded-3xl border px-6 py-4 mb-5 ${TRX_TONE[trxType].panel}`}>
+                <div className="text-center">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">Sebelum</p>
+                  <p className="text-2xl font-extrabold tabular-nums text-slate-400">{pv.from}</p>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <span className={`px-3 py-1 rounded-full text-sm font-extrabold tabular-nums ${TRX_TONE[trxType].badge}`}>{diffLabel}</span>
+                  <span className={`text-xl leading-none font-extrabold ${TRX_TONE[trxType].arrow}`}>→</span>
+                </div>
+                <div className="text-center">
+                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">Sesudah</p>
+                  <p className="text-3xl font-extrabold tabular-nums text-slate-900">{pv.to} <span className="text-sm text-slate-400">{trxItem.unit}</span></p>
+                </div>
+              </div>
+            );
+          })()}
 
           <label className={labelCls}>Keterangan (opsional)</label>
           <input value={trxNote} onChange={(e) => setTrxNote(e.target.value)}
             placeholder={trxType === 'in' ? 'cth: dari supplier PT Maju' : trxType === 'out' ? 'cth: untuk divisi operasional' : 'cth: selisih hitung rak'}
             className={`${inputCls} mb-4`} />
-
-          {trxPreview() && (
-            <div className="flex items-center justify-center gap-3 bg-slate-900 text-white rounded-2xl py-4 mb-4 font-extrabold tabular-nums">
-              <span className="text-slate-400">{trxPreview().from}</span>
-              <span className="text-amber-400">→</span>
-              <span className="text-xl">{trxPreview().to}</span>
-              <span className="text-xs text-slate-400">{trxItem.unit}</span>
-            </div>
-          )}
 
           {trxError && (
             <div className="mb-4 bg-red-50 border border-red-100 text-red-700 text-sm font-bold rounded-2xl px-4 py-3 flex items-center gap-2">
@@ -432,8 +476,8 @@ export default function BarangPage() {
           )}
 
           <button onClick={submitTrx} disabled={trxLoading}
-            className="w-full bg-slate-900 text-white font-extrabold rounded-2xl py-4 hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-60">
-            {trxLoading ? 'Menyimpan...' : 'Simpan Transaksi'}
+            className={`w-full text-white font-extrabold rounded-2xl py-4 active:scale-[0.99] transition disabled:opacity-60 ${TRX_TONE[trxType].btn}`}>
+            {trxLoading ? 'Menyimpan...' : TRX_TONE[trxType].label}
           </button>
         </Modal>
       )}
