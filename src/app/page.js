@@ -80,7 +80,7 @@ export default function PublicCatalog() {
             backgroundSize: '26px 26px',
           }}
         />
-        <div className="relative max-w-6xl mx-auto px-4 pt-10 pb-24 sm:pt-14 sm:pb-28">
+        <div className="relative max-w-6xl mx-auto px-4 pt-10 pb-16 sm:pt-14 sm:pb-20">
           <div className="flex items-center gap-3">
             <span className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/40">
               <BoxIcon className="w-7 h-7" />
@@ -95,24 +95,20 @@ export default function PublicCatalog() {
             Cek ketersediaan barang secara langsung. Data diperbarui otomatis setiap ada barang masuk atau keluar.
           </p>
         </div>
-        {/* search mengambang */}
-        <div className="absolute inset-x-0 bottom-0 translate-y-1/2">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="relative max-w-xl">
-              <SearchIcon className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Cari nama barang atau kode..."
-                className="w-full bg-white rounded-2xl pl-13 pr-5 py-4 text-slate-900 text-[15px] font-semibold placeholder:text-slate-400 placeholder:font-medium outline-none shadow-xl shadow-slate-900/10 border border-slate-100 focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition"
-                style={{ paddingLeft: '3.25rem' }}
-              />
-            </div>
-          </div>
-        </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 pt-14 pb-8">
+      <main className="max-w-6xl mx-auto px-4 pb-8">
+        {/* search mengambang */}
+        <div className="relative z-10 -mt-7 mb-7 max-w-xl">
+          <SearchIcon className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Cari nama barang atau kode..."
+            className="w-full bg-white rounded-2xl pr-5 py-4 text-slate-900 text-[15px] font-semibold placeholder:text-slate-400 placeholder:font-medium outline-none shadow-xl shadow-slate-900/10 border border-slate-100 focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition"
+            style={{ paddingLeft: '3.25rem' }}
+          />
+        </div>
         {/* ===== STATS ===== */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-7 animate-fade-up">
           {statCards.map((s) => (
