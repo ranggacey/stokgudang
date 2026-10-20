@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { CameraIcon } from '@/components/icons';
 
@@ -9,13 +9,22 @@ const UNITS = ['pcs', 'box', 'dus', 'kg', 'liter', 'meter', 'pak', 'set'];
 const EMPTY_FORM = { name: '', sku: '', category: '', unit: 'pcs', location: '', minStock: 0, initialStock: 0, image: '' };
 
 function Stepper({ value, onChange }) {
+  const [text, setText] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+  useEffect(() => { if (!focused) setText(String(value)); }, [value, focused]);
   return (
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
         className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-xl hover:bg-slate-200 active:scale-95 transition">−</button>
       <input
-        type="number" min="0" value={value}
-        onChange={(e) => onChange(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
+        type="number" min="0" value={text}
+        onFocus={(e) => { setFocused(true); e.target.select(); }}
+        onBlur={() => { setFocused(false); setText(String(value)); }}
+        onChange={(e) => {
+          const t = e.target.value.replace(/[^0-9]/g, '');
+          setText(t);
+          onChange(t === '' ? 0 : parseInt(t, 10));
+        }}
         className="w-24 text-center text-2xl font-extrabold tabular-nums border border-slate-200 rounded-2xl py-2.5 outline-none focus:border-amber-500"
       />
       <button type="button" onClick={() => onChange(value + 1)}
@@ -180,8 +189,13 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
           </div>
           <div>
             <label className={labelCls}>Stok minimum</label>
-            <input type="number" min="0" value={form.minStock}
-              onChange={(e) => setForm({ ...form, minStock: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
+            <input type="number" min="0" value={form.minStock === '' ? '' : form.minStock}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => {
+                const t = e.target.value;
+                setForm({ ...form, minStock: t === '' ? '' : Math.max(0, Math.floor(Number(t) || 0)) });
+              }}
+              placeholder="0"
               className={inputCls} />
             {errors.minStock && <p className="text-red-600 text-xs font-bold mt-1">{errors.minStock}</p>}
           </div>

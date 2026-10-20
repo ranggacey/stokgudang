@@ -18,13 +18,22 @@ const SORTS = [
 
 
 function Stepper({ value, onChange }) {
+  const [text, setText] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+  useEffect(() => { if (!focused) setText(String(value)); }, [value, focused]);
   return (
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
         className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-xl hover:bg-slate-200 active:scale-95 transition">−</button>
       <input
-        type="number" min="0" value={value}
-        onChange={(e) => onChange(Math.max(0, Math.floor(Number(e.target.value) || 0)))}
+        type="number" min="0" value={text}
+        onFocus={(e) => { setFocused(true); e.target.select(); }}
+        onBlur={() => { setFocused(false); setText(String(value)); }}
+        onChange={(e) => {
+          const t = e.target.value.replace(/[^0-9]/g, '');
+          setText(t);
+          onChange(t === '' ? 0 : parseInt(t, 10));
+        }}
         className="w-24 text-center text-2xl font-extrabold tabular-nums border border-slate-200 rounded-2xl py-2.5 outline-none focus:border-amber-500"
       />
       <button type="button" onClick={() => onChange(value + 1)}
