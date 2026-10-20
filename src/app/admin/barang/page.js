@@ -76,6 +76,11 @@ export default function BarangPage() {
 
   const [toast, setToast] = useState(null);
 
+  const [page, setPage] = useState(1);
+  const PER_PAGE = 8;
+
+  useEffect(() => { setPage(1); }, [q, category, sort, status]);
+
   useEffect(() => {
     const t = setTimeout(fetchItems, 300);
     return () => clearTimeout(t);
@@ -208,6 +213,10 @@ export default function BarangPage() {
   const inputCls = 'w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition';
   const labelCls = 'block text-xs font-extrabold text-slate-500 uppercase tracking-wide mb-1.5';
 
+  const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = items.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+
   return (
     <div className="animate-fade-up">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
@@ -258,7 +267,7 @@ export default function BarangPage() {
         <>
           {/* mobile cards */}
           <div className="grid grid-cols-1 gap-3 md:hidden">
-            {items.map((item) => {
+            {pageItems.map((item) => {
               const st = stockStatus(item);
               return (
                 <div key={item._id} className="bg-white rounded-3xl border border-slate-100 p-4">
@@ -318,7 +327,7 @@ export default function BarangPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {items.map((item) => {
+                {pageItems.map((item) => {
                   const st = stockStatus(item);
                   return (
                     <tr key={item._id} className="hover:bg-slate-50/60">
@@ -349,6 +358,33 @@ export default function BarangPage() {
               </tbody>
             </table>
           </div>
+
+          {/* pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-5">
+              <p className="text-xs font-bold text-slate-400">
+                {(safePage - 1) * PER_PAGE + 1}–{Math.min(safePage * PER_PAGE, items.length)} dari {items.length} barang
+              </p>
+              <div className="flex items-center gap-1.5">
+                <button onClick={() => setPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
+                  className="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-extrabold text-slate-600 disabled:opacity-40 hover:border-slate-300 transition">
+                  ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button key={p} onClick={() => setPage(p)}
+                    className={`w-10 h-10 rounded-xl text-sm font-extrabold transition ${
+                      p === safePage ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                    }`}>
+                    {p}
+                  </button>
+                ))}
+                <button onClick={() => setPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
+                  className="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-extrabold text-slate-600 disabled:opacity-40 hover:border-slate-300 transition">
+                  ›
+                </button>
+              </div>
+            </div>
+          )}
         </>
       )}
 
