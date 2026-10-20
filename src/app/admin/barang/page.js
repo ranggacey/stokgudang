@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   BoxIcon, SearchIcon, PlusIcon, MinusIcon, AdjustIcon,
@@ -24,7 +24,7 @@ function Stepper({ value, onChange }) {
   return (
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-xl hover:bg-slate-200 active:scale-95 transition">−</button>
+        className="nb-chip w-12 h-12 rounded-2xl bg-[#FFBEFB] text-[#241F31] font-black text-xl">−</button>
       <input
         type="number" min="0" value={text}
         onFocus={(e) => { setFocused(true); e.target.select(); }}
@@ -34,32 +34,32 @@ function Stepper({ value, onChange }) {
           setText(t);
           onChange(t === '' ? 0 : parseInt(t, 10));
         }}
-        className="w-24 text-center text-2xl font-extrabold tabular-nums border border-slate-200 rounded-2xl py-2.5 outline-none focus:border-amber-500"
+        className="nb-input w-24 text-center text-2xl font-black tabular-nums py-2.5"
       />
       <button type="button" onClick={() => onChange(value + 1)}
-        className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-xl hover:bg-slate-200 active:scale-95 transition">+</button>
+        className="nb-chip w-12 h-12 rounded-2xl bg-[#FFF4BF] text-[#241F31] font-black text-xl">+</button>
     </div>
   );
 }
 
 const TRX_TONE = {
-  in: { chipBg: 'bg-emerald-50 text-emerald-700 border-emerald-100', chipOn: 'bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/30', panel: 'bg-emerald-50 border-emerald-100', badge: 'bg-emerald-500 text-white', arrow: 'text-emerald-400', btn: 'bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-600/30', label: 'Simpan Barang Masuk' },
-  out: { chipBg: 'bg-red-50 text-red-700 border-red-100', chipOn: 'bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/30', panel: 'bg-red-50 border-red-100', badge: 'bg-red-500 text-white', arrow: 'text-red-400', btn: 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-600/30', label: 'Simpan Barang Keluar' },
-  adjust: { chipBg: 'bg-amber-50 text-amber-700 border-amber-100', chipOn: 'bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/30', panel: 'bg-amber-50 border-amber-100', badge: 'bg-amber-500 text-white', arrow: 'text-amber-400', btn: 'bg-amber-500 hover:bg-amber-600 shadow-lg shadow-amber-500/30', label: 'Simpan Hasil Opname' },
+  in: { chipBg: 'bg-white', chipOn: 'bg-[#FFF4BF] shadow-[4px_4px_0_#241F31]', panel: 'bg-[#FFF4BF]', badge: 'bg-[#241F31] text-[#FFF4BF]', arrow: 'text-[#241F31]', btn: 'bg-[#FFF4BF] text-[#241F31]', label: 'Simpan Barang Masuk' },
+  out: { chipBg: 'bg-white', chipOn: 'bg-[#FFBEFB] shadow-[4px_4px_0_#241F31]', panel: 'bg-[#FFBEFB]', badge: 'bg-[#241F31] text-[#FFBEFB]', arrow: 'text-[#241F31]', btn: 'bg-[#FFBEFB] text-[#241F31]', label: 'Simpan Barang Keluar' },
+  adjust: { chipBg: 'bg-white', chipOn: 'bg-[#DC95FF] shadow-[4px_4px_0_#241F31]', panel: 'bg-[#DC95FF]', badge: 'bg-[#241F31] text-[#DC95FF]', arrow: 'text-[#241F31]', btn: 'bg-[#DC95FF] text-[#241F31]', label: 'Simpan Hasil Opname' },
 };
 
-function Modal({ onClose, children, title }) {
+function Modal({ onClose, children, title, wide }) {
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="absolute inset-y-0 right-0 w-full sm:max-w-md bg-white shadow-2xl overflow-y-auto animate-slide-in-right flex flex-col">
-        <div className="sticky top-0 bg-white/95 backdrop-blur px-6 py-5 flex items-center justify-between border-b border-slate-100 z-10">
-          <h3 className="font-extrabold text-xl">{title}</h3>
-          <button onClick={onClose} aria-label="Tutup" className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6">
+      <div className="absolute inset-0 bg-[#241F31]/60" onClick={onClose} />
+      <div className={`relative bg-[#FFF9E3] w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} border-[3px] border-[#241F31] rounded-3xl shadow-[8px_8px_0_#241F31] max-h-[94vh] overflow-y-auto animate-pop-in`}>
+        <div className="sticky top-0 bg-[#FFF4BF] px-6 py-4 flex items-center justify-between border-b-[3px] border-[#241F31] z-10">
+          <h3 className="font-black text-xl">{title}</h3>
+          <button onClick={onClose} aria-label="Tutup" className="nb-chip p-1.5 rounded-lg bg-white text-[#241F31]">
             <CloseIcon className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6 flex-1">{children}</div>
+        <div className="p-5 sm:p-6">{children}</div>
       </div>
     </div>
   );
@@ -97,7 +97,7 @@ export default function BarangPage() {
       const msg = sessionStorage.getItem('barang_toast');
       if (msg) { setToast(msg); sessionStorage.removeItem('barang_toast'); }
     } catch {}
-    const t = setTimeout(fetchItems, 300);
+    const t = setTimeout(fetchItems, 120);
     return () => clearTimeout(t);
   }, [q, category, sort, status]);
 
@@ -108,15 +108,19 @@ export default function BarangPage() {
     }
   }, [toast]);
 
+  const abortRef = useRef(null);
   async function fetchItems() {
-    setLoading(true);
+    abortRef.current?.abort();
+    const ctl = new AbortController();
+    abortRef.current = ctl;
+    if (items.length === 0) setLoading(true);
     try {
       const p = new URLSearchParams({ q, category, sort, status });
-      const r = await fetch(`/api/items?${p}`);
+      const r = await fetch(`/api/items?${p}`, { signal: ctl.signal });
       const d = await r.json();
       setItems(d.items || []);
       setCategories(d.categories || []);
-    } catch (e) { console.error(e); }
+    } catch (e) { if (e.name !== 'AbortError') console.error(e); }
     finally { setLoading(false); }
   }
 
@@ -174,8 +178,8 @@ export default function BarangPage() {
     }
   }
 
-  const inputCls = 'w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition';
-  const labelCls = 'block text-xs font-extrabold text-slate-500 uppercase tracking-wide mb-1.5';
+  const inputCls = 'nb-input w-full px-4 py-3 text-sm font-bold transition';
+  const labelCls = 'block text-xs font-extrabold text-[#241F31]/60 uppercase tracking-[0.18em] mb-1.5';
 
   const totalPages = Math.max(1, Math.ceil(items.length / PER_PAGE));
   const safePage = Math.min(page, totalPages);
@@ -185,12 +189,12 @@ export default function BarangPage() {
     <div className="animate-fade-up">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
         <div>
-          <p className="text-[11px] font-extrabold tracking-[0.25em] text-amber-600 uppercase">Panel Admin</p>
-          <h1 className="text-3xl sm:text-4xl font-extrabold mt-1">Barang</h1>
-          <p className="text-sm text-slate-500 mt-1.5">{items.length} jenis barang</p>
+          <p className="text-[11px] font-extrabold tracking-[0.25em] text-[#8C56D4] uppercase">Panel Admin</p>
+          <h1 className="text-3xl sm:text-4xl font-black mt-1">Barang</h1>
+          <p className="text-sm font-semibold text-[#241F31]/60 mt-1.5">{items.length} jenis barang</p>
         </div>
         <Link href="/admin/barang/tambah"
-          className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-slate-900 text-white text-sm font-extrabold hover:bg-slate-800 active:scale-95 transition">
+          className="nb-btn inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#DC95FF] text-[#241F31] text-sm font-black">
           <PlusIcon className="w-4 h-4" />
           Tambah Barang
         </Link>
@@ -199,17 +203,17 @@ export default function BarangPage() {
       {/* filter */}
       <div className="flex flex-col sm:flex-row gap-2 mb-5">
         <div className="relative flex-1">
-          <SearchIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
+          <SearchIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-[#241F31]/50" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Cari nama / kode..."
-            className="w-full border border-slate-200 rounded-2xl pl-12 pr-4 py-3 text-sm font-semibold outline-none focus:border-amber-500 bg-white" />
+            className="nb-input w-full pl-12 pr-4 py-3 text-sm font-bold shadow-[4px_4px_0_#241F31]" />
         </div>
         <select value={category} onChange={(e) => setCategory(e.target.value)}
-          className="px-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold outline-none focus:border-amber-500">
+          className="nb-input px-4 py-3 text-sm font-extrabold outline-none cursor-pointer">
           <option value="">Semua kategori</option>
           {categories.map((c) => <option key={c} value={c}>{c}</option>)}
         </select>
         <select value={sort} onChange={(e) => setSort(e.target.value)}
-          className="px-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold outline-none focus:border-amber-500">
+          className="nb-input px-4 py-3 text-sm font-extrabold outline-none cursor-pointer">
           {SORTS.map((s) => <option key={s.v} value={s.v}>{s.label}</option>)}
         </select>
       </div>
@@ -217,13 +221,15 @@ export default function BarangPage() {
       {/* daftar */}
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <div className="w-10 h-10 rounded-full border-4 border-slate-200 border-t-slate-900 animate-spin" />
+          <div className="w-10 h-10 rounded-full border-4 border-[#DC95FF] border-t-[#8C56D4] animate-spin" />
         </div>
       ) : items.length === 0 ? (
-        <div className="bg-white rounded-3xl border border-slate-100 p-12 text-center">
-          <BoxIcon className="w-12 h-12 mx-auto text-slate-200 mb-3" />
-          <p className="font-bold text-slate-500">Belum ada barang</p>
-          <Link href="/admin/barang/tambah" className="mt-4 inline-block px-5 py-2.5 rounded-2xl bg-slate-900 text-white text-sm font-extrabold">
+        <div className="nb-card p-12 text-center">
+          <span className="inline-flex w-14 h-14 rounded-2xl bg-[#DC95FF] border-[3px] border-[#241F31] items-center justify-center mb-3">
+            <BoxIcon className="w-7 h-7 text-[#241F31]" />
+          </span>
+          <p className="font-extrabold">Belum ada barang</p>
+          <Link href="/admin/barang/tambah" className="nb-btn mt-4 inline-block px-5 py-2.5 rounded-2xl bg-[#FFF4BF] text-[#241F31] text-sm font-extrabold">
             Tambah barang pertama
           </Link>
         </div>
@@ -234,19 +240,19 @@ export default function BarangPage() {
             {pageItems.map((item) => {
               const st = stockStatus(item);
               return (
-                <div key={item._id} className="bg-white rounded-3xl border border-slate-100 p-4">
+                <div key={item._id} className="nb-card-sm p-4">
                   <div className="flex items-center gap-3 mb-3">
                     {item.image ? (
                       <img src={item.image} alt={item.name}
-                        className="w-11 h-11 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+                        className="w-11 h-11 rounded-2xl object-cover flex-shrink-0 border-[2.5px] border-[#241F31]" />
                     ) : (
-                      <span className="w-11 h-11 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                      <span className="w-11 h-11 rounded-2xl bg-[#DC95FF] text-[#241F31] border-[2.5px] border-[#241F31] flex items-center justify-center flex-shrink-0">
                         <BoxIcon className="w-5 h-5" />
                       </span>
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="font-extrabold truncate">{item.name}</p>
-                      <p className="text-xs text-slate-400 font-mono">{item.sku} · {item.category}</p>
+                      <p className="text-xs text-[#241F31]/50 font-mono">{item.sku} · {item.category}</p>
                     </div>
                     <StatusBadge status={st} />
                   </div>
@@ -256,27 +262,27 @@ export default function BarangPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-2 mb-2">
                     <button onClick={() => openTrx(item, 'in')}
-                      className="flex items-center justify-center gap-1 py-2.5 rounded-xl bg-emerald-100 text-emerald-700 text-xs font-extrabold active:scale-95 transition">
+                      className="nb-chip flex items-center justify-center gap-1 py-2.5 rounded-xl bg-[#FFF4BF] text-[#241F31] text-xs font-extrabold">
                       <PlusIcon className="w-4 h-4" /> Masuk
                     </button>
                     <button onClick={() => openTrx(item, 'out')}
-                      className="flex items-center justify-center gap-1 py-2.5 rounded-xl bg-red-100 text-red-700 text-xs font-extrabold active:scale-95 transition">
+                      className="nb-chip flex items-center justify-center gap-1 py-2.5 rounded-xl bg-[#FFBEFB] text-[#241F31] text-xs font-extrabold">
                       <MinusIcon className="w-4 h-4" /> Keluar
                     </button>
                     <button onClick={() => openTrx(item, 'adjust')}
-                      className="flex items-center justify-center gap-1 py-2.5 rounded-xl bg-amber-100 text-amber-700 text-xs font-extrabold active:scale-95 transition">
+                      className="nb-chip flex items-center justify-center gap-1 py-2.5 rounded-xl bg-[#DC95FF] text-[#241F31] text-xs font-extrabold">
                       <AdjustIcon className="w-4 h-4" /> Opname
                     </button>
                   </div>
                   <div className="flex gap-2">
                     <Link href={`/admin/barang/${item._id}`}
-                      className="flex-1 text-center py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-extrabold">
+                      className="nb-chip flex-1 text-center py-2 rounded-xl bg-white text-[#241F31] text-xs font-extrabold">
                       Detail & Riwayat
                     </Link>
                     <button onClick={() => setEditing(item)} aria-label="Edit"
-                      className="p-2 rounded-xl bg-slate-100 text-slate-600"><EditIcon className="w-4 h-4" /></button>
+                      className="nb-chip p-2 rounded-xl bg-white text-[#241F31]"><EditIcon className="w-4 h-4" /></button>
                     <button onClick={() => deleteItem(item)} aria-label="Hapus"
-                      className="p-2 rounded-xl bg-slate-100 text-slate-600"><TrashIcon className="w-4 h-4" /></button>
+                      className="nb-chip p-2 rounded-xl bg-[#FFBEFB] text-[#241F31]"><TrashIcon className="w-4 h-4" /></button>
                   </div>
                 </div>
               );
@@ -284,53 +290,53 @@ export default function BarangPage() {
           </div>
 
           {/* desktop table */}
-          <div className="hidden md:block bg-white rounded-3xl border border-slate-100 overflow-hidden">
+          <div className="hidden md:block nb-card overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-left">
-                  <th className="px-5 py-3.5 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Barang</th>
-                  <th className="px-5 py-3.5 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Kategori</th>
+                <tr className="bg-[#FFF4BF] border-b-[3px] border-[#241F31] text-left">
+                  <th className="px-5 py-3.5 text-xs font-black text-[#241F31] uppercase tracking-[0.15em]">Barang</th>
+                  <th className="px-5 py-3.5 text-xs font-black text-[#241F31] uppercase tracking-[0.15em]">Kategori</th>
                   <th className="px-5 py-3.5 text-xs font-extrabold text-slate-500 uppercase tracking-wide text-right">Stok</th>
-                  <th className="px-5 py-3.5 text-xs font-extrabold text-slate-500 uppercase tracking-wide">Status</th>
+                  <th className="px-5 py-3.5 text-xs font-black text-[#241F31] uppercase tracking-[0.15em]">Status</th>
                   <th className="px-5 py-3.5 text-xs font-extrabold text-slate-500 uppercase tracking-wide text-right">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y-2 divide-[#241F31]/10">
                 {pageItems.map((item) => {
                   const st = stockStatus(item);
                   return (
-                    <tr key={item._id} className="hover:bg-slate-50/60">
+                    <tr key={item._id} className="hover:bg-[#FFF9E3]">
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           {item.image ? (
                             <img src={item.image} alt={item.name}
-                              className="w-10 h-10 rounded-xl object-cover flex-shrink-0 border border-slate-100" />
+                              className="w-10 h-10 rounded-xl object-cover flex-shrink-0 border-[2.5px] border-[#241F31]" />
                           ) : (
-                            <span className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+                            <span className="w-10 h-10 rounded-xl bg-[#DC95FF] text-[#241F31] border-[2.5px] border-[#241F31] flex items-center justify-center flex-shrink-0">
                               <BoxIcon className="w-4 h-4" />
                             </span>
                           )}
                           <div className="min-w-0">
-                            <Link href={`/admin/barang/${item._id}`} className="font-extrabold hover:text-amber-600 transition-colors">{item.name}</Link>
-                            <p className="text-xs text-slate-400 font-mono">{item.sku}{item.location ? ` · Rak ${item.location}` : ''}</p>
+                            <Link href={`/admin/barang/${item._id}`} className="font-extrabold hover:text-[#8C56D4] transition-colors">{item.name}</Link>
+                            <p className="text-xs text-[#241F31]/50 font-mono">{item.sku}{item.location ? ` · Rak ${item.location}` : ''}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-5 py-4 text-slate-500 font-semibold">{item.category}</td>
+                      <td className="px-5 py-4 text-[#241F31]/70 font-bold">{item.category}</td>
                       <td className="px-5 py-4 text-right font-extrabold tabular-nums">{item.stock} <span className="text-xs text-slate-400 font-bold">{item.unit}</span></td>
                       <td className="px-5 py-4"><StatusBadge status={st} /></td>
                       <td className="px-5 py-4">
                         <div className="flex justify-end gap-1.5">
                           <button onClick={() => openTrx(item, 'in')} title="Barang masuk"
-                            className="p-2 rounded-xl bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition"><PlusIcon className="w-4 h-4" /></button>
+                            className="nb-chip p-2 rounded-xl bg-[#FFF4BF] text-[#241F31]"><PlusIcon className="w-4 h-4" /></button>
                           <button onClick={() => openTrx(item, 'out')} title="Barang keluar"
-                            className="p-2 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 transition"><MinusIcon className="w-4 h-4" /></button>
+                            className="nb-chip p-2 rounded-xl bg-[#FFBEFB] text-[#241F31]"><MinusIcon className="w-4 h-4" /></button>
                           <button onClick={() => openTrx(item, 'adjust')} title="Opname / penyesuaian"
-                            className="p-2 rounded-xl bg-amber-100 text-amber-700 hover:bg-amber-200 transition"><AdjustIcon className="w-4 h-4" /></button>
+                            className="nb-chip p-2 rounded-xl bg-[#DC95FF] text-[#241F31]"><AdjustIcon className="w-4 h-4" /></button>
                           <button onClick={() => setEditing(item)} title="Edit"
-                            className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition"><EditIcon className="w-4 h-4" /></button>
+                            className="nb-chip p-2 rounded-xl bg-white text-[#241F31]"><EditIcon className="w-4 h-4" /></button>
                           <button onClick={() => deleteItem(item)} title="Hapus"
-                            className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 transition"><TrashIcon className="w-4 h-4" /></button>
+                            className="nb-chip p-2 rounded-xl bg-white text-[#241F31]"><TrashIcon className="w-4 h-4" /></button>
                         </div>
                       </td>
                     </tr>
@@ -343,24 +349,24 @@ export default function BarangPage() {
           {/* pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between mt-5">
-              <p className="text-xs font-bold text-slate-400">
+              <p className="text-xs font-extrabold text-[#241F31]/50">
                 {(safePage - 1) * PER_PAGE + 1}–{Math.min(safePage * PER_PAGE, items.length)} dari {items.length} barang
               </p>
               <div className="flex items-center gap-1.5">
                 <button onClick={() => setPage(Math.max(1, safePage - 1))} disabled={safePage === 1}
-                  className="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-extrabold text-slate-600 disabled:opacity-40 hover:border-slate-300 transition">
+                  className="nb-chip px-3.5 py-2.5 rounded-xl bg-white text-sm font-extrabold text-[#241F31] disabled:opacity-40">
                   ‹
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
                   <button key={p} onClick={() => setPage(p)}
-                    className={`w-10 h-10 rounded-xl text-sm font-extrabold transition ${
-                      p === safePage ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
+                    className={`nb-chip w-10 h-10 rounded-xl text-sm font-extrabold ${
+                      p === safePage ? 'bg-[#241F31] text-white' : 'bg-white text-[#241F31]'
                     }`}>
                     {p}
                   </button>
                 ))}
                 <button onClick={() => setPage(Math.min(totalPages, safePage + 1))} disabled={safePage === totalPages}
-                  className="px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-extrabold text-slate-600 disabled:opacity-40 hover:border-slate-300 transition">
+                  className="nb-chip px-3.5 py-2.5 rounded-xl bg-white text-sm font-extrabold text-[#241F31] disabled:opacity-40">
                   ›
                 </button>
               </div>
@@ -386,99 +392,105 @@ export default function BarangPage() {
         </Modal>
       )}
 
-      {/* modal transaksi */}
+      {/* modal transaksi — landscape */}
       {trxItem && (
-        <Modal onClose={() => setTrxItem(null)} title="Catat Pergerakan Stok">
-          {/* item */}
-          <div className="flex items-center gap-3 mb-5 p-4 bg-slate-50 rounded-3xl">
-            {trxItem.image ? (
-              <img src={trxItem.image} alt={trxItem.name}
-                className="w-12 h-12 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
-            ) : (
-              <span className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
-                <BoxIcon className="w-6 h-6" />
-              </span>
-            )}
-            <div className="min-w-0">
-              <p className="font-extrabold truncate">{trxItem.name}</p>
-              <p className="text-xs text-slate-400">Stok saat ini: <b className="text-slate-700 tabular-nums">{trxItem.stock} {trxItem.unit}</b></p>
-            </div>
-          </div>
-
-          {/* tipe */}
-          <div className="grid grid-cols-3 gap-2.5 mb-6">
-            {[
-              { v: 'in', label: 'Masuk', desc: 'Tambah stok', Icon: ArrowUpIcon },
-              { v: 'out', label: 'Keluar', desc: 'Kurangi stok', Icon: ArrowDownIcon },
-              { v: 'adjust', label: 'Opname', desc: 'Hasil hitung', Icon: AdjustIcon },
-            ].map((t) => {
-              const on = trxType === t.v;
-              return (
-                <button key={t.v} type="button" onClick={() => { setTrxType(t.v); setTrxQty(t.v === 'adjust' ? trxItem.stock : 1); setTrxError(''); }}
-                  className={`rounded-2xl border py-3.5 px-2 flex flex-col items-center gap-1 transition-all active:scale-95 ${on ? TRX_TONE[t.v].chipOn : TRX_TONE[t.v].chipBg}`}>
-                  <t.Icon className="w-6 h-6" />
-                  <span className="text-sm font-extrabold leading-none mt-0.5">{t.label}</span>
-                  <span className={`text-[10px] font-bold ${on ? 'text-white/80' : 'opacity-60'}`}>{t.desc}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* jumlah */}
-          <p className="text-center text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.2em] mb-3">
-            {trxType === 'adjust' ? 'Hasil hitungan fisik' : trxType === 'in' ? 'Jumlah masuk' : 'Jumlah keluar'}
-          </p>
-          <div className="flex justify-center"><Stepper value={trxQty} onChange={setTrxQty} /></div>
-          {trxType !== 'adjust' ? (
-            <div className="flex justify-center gap-2 mt-3.5 mb-6">
-              {[5, 10, 50, 100].map((n) => (
-                <button key={n} type="button" onClick={() => setTrxQty((q) => q + n)}
-                  className="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-xs font-extrabold hover:bg-slate-200 active:scale-95 transition">
-                  +{n}
-                </button>
-              ))}
-            </div>
-          ) : <div className="mb-6" />}
-
-          {/* preview hasil */}
-          {(() => {
-            const pv = trxPreview();
-            if (!pv) return null;
-            const diff = pv.to - pv.from;
-            const diffLabel = diff > 0 ? `+${diff}` : diff < 0 ? `−${Math.abs(diff)}` : '0';
-            return (
-              <div className={`flex items-center justify-between rounded-3xl border px-6 py-4 mb-5 ${TRX_TONE[trxType].panel}`}>
-                <div className="text-center">
-                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">Sebelum</p>
-                  <p className="text-2xl font-extrabold tabular-nums text-slate-400">{pv.from}</p>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <span className={`px-3 py-1 rounded-full text-sm font-extrabold tabular-nums ${TRX_TONE[trxType].badge}`}>{diffLabel}</span>
-                  <span className={`text-xl leading-none font-extrabold ${TRX_TONE[trxType].arrow}`}>→</span>
-                </div>
-                <div className="text-center">
-                  <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-400 mb-1">Sesudah</p>
-                  <p className="text-3xl font-extrabold tabular-nums text-slate-900">{pv.to} <span className="text-sm text-slate-400">{trxItem.unit}</span></p>
+        <Modal wide onClose={() => setTrxItem(null)} title="Catat Pergerakan Stok">
+          <div className="grid sm:grid-cols-[1fr_1.2fr] gap-6">
+            {/* kiri: item + tipe */}
+            <div>
+              <div className="flex items-center gap-3 mb-5 p-4 bg-white border-[3px] border-[#241F31] rounded-2xl">
+                {trxItem.image ? (
+                  <img src={trxItem.image} alt={trxItem.name}
+                    className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border-[2.5px] border-[#241F31]" />
+                ) : (
+                  <span className="w-12 h-12 rounded-xl bg-[#DC95FF] text-[#241F31] border-[2.5px] border-[#241F31] flex items-center justify-center flex-shrink-0">
+                    <BoxIcon className="w-6 h-6" />
+                  </span>
+                )}
+                <div className="min-w-0">
+                  <p className="font-extrabold truncate">{trxItem.name}</p>
+                  <p className="text-xs font-bold text-[#241F31]/50">Stok saat ini: <b className="text-[#241F31] tabular-nums">{trxItem.stock} {trxItem.unit}</b></p>
                 </div>
               </div>
-            );
-          })()}
 
-          <label className={labelCls}>Keterangan (opsional)</label>
-          <input value={trxNote} onChange={(e) => setTrxNote(e.target.value)}
-            placeholder={trxType === 'in' ? 'cth: dari supplier PT Maju' : trxType === 'out' ? 'cth: untuk divisi operasional' : 'cth: selisih hitung rak'}
-            className={`${inputCls} mb-4`} />
-
-          {trxError && (
-            <div className="mb-4 bg-red-50 border border-red-100 text-red-700 text-sm font-bold rounded-2xl px-4 py-3 flex items-center gap-2">
-              <AlertIcon className="w-5 h-5 flex-shrink-0" /> {trxError}
+              <div className="grid grid-cols-3 sm:grid-cols-1 gap-2.5">
+                {[
+                  { v: 'in', label: 'Masuk', desc: 'Tambah stok', Icon: ArrowUpIcon },
+                  { v: 'out', label: 'Keluar', desc: 'Kurangi stok', Icon: ArrowDownIcon },
+                  { v: 'adjust', label: 'Opname', desc: 'Hasil hitung', Icon: AdjustIcon },
+                ].map((t) => {
+                  const on = trxType === t.v;
+                  return (
+                    <button key={t.v} type="button" onClick={() => { setTrxType(t.v); setTrxQty(t.v === 'adjust' ? trxItem.stock : 1); setTrxError(''); }}
+                      className={`nb-chip rounded-2xl sm:rounded-xl py-3.5 px-3 sm:py-3 flex flex-col sm:flex-row items-center gap-1.5 sm:gap-3 text-[#241F31] ${on ? TRX_TONE[t.v].chipOn : TRX_TONE[t.v].chipBg}`}>
+                      <t.Icon className="w-6 h-6 flex-shrink-0" />
+                      <span className="text-center sm:text-left">
+                        <span className="block text-sm font-black leading-none">{t.label}</span>
+                        <span className="block text-[10px] font-bold opacity-60 mt-0.5">{t.desc}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          )}
 
-          <button onClick={submitTrx} disabled={trxLoading}
-            className={`w-full text-white font-extrabold rounded-2xl py-4 active:scale-[0.99] transition disabled:opacity-60 ${TRX_TONE[trxType].btn}`}>
-            {trxLoading ? 'Menyimpan...' : TRX_TONE[trxType].label}
-          </button>
+            {/* kanan: jumlah + preview + aksi */}
+            <div>
+              <p className="text-center text-[11px] font-extrabold uppercase tracking-[0.2em] text-[#241F31]/50 mb-3">
+                {trxType === 'adjust' ? 'Hasil hitungan fisik' : trxType === 'in' ? 'Jumlah masuk' : 'Jumlah keluar'}
+              </p>
+              <div className="flex justify-center"><Stepper value={trxQty} onChange={setTrxQty} /></div>
+              {trxType !== 'adjust' ? (
+                <div className="flex justify-center gap-2 mt-3.5 mb-5">
+                  {[5, 10, 50, 100].map((n) => (
+                    <button key={n} type="button" onClick={() => setTrxQty((q) => q + n)}
+                      className="nb-chip px-4 py-1.5 rounded-full bg-white text-xs font-extrabold">
+                      +{n}
+                    </button>
+                  ))}
+                </div>
+              ) : <div className="mb-5" />}
+
+              {(() => {
+                const pv = trxPreview();
+                if (!pv) return null;
+                const diff = pv.to - pv.from;
+                const diffLabel = diff > 0 ? `+${diff}` : diff < 0 ? `\u2212${Math.abs(diff)}` : '0';
+                return (
+                  <div className={`flex items-center justify-between rounded-2xl border-[3px] border-[#241F31] px-6 py-3.5 mb-5 ${TRX_TONE[trxType].panel}`}>
+                    <div className="text-center">
+                      <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#241F31]/50 mb-0.5">Sebelum</p>
+                      <p className="text-2xl font-black tabular-nums text-[#241F31]/60">{pv.from}</p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <span className={`px-3 py-1 rounded-full text-sm font-black tabular-nums border-[2.5px] border-[#241F31] ${TRX_TONE[trxType].badge}`}>{diffLabel}</span>
+                      <span className={`text-xl leading-none font-black ${TRX_TONE[trxType].arrow}`}>→</span>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#241F31]/50 mb-0.5">Sesudah</p>
+                      <p className="text-3xl font-black tabular-nums text-[#241F31]">{pv.to} <span className="text-sm font-bold text-[#241F31]/50">{trxItem.unit}</span></p>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <label className={labelCls}>Keterangan (opsional)</label>
+              <input value={trxNote} onChange={(e) => setTrxNote(e.target.value)}
+                placeholder={trxType === 'in' ? 'cth: dari supplier PT Maju' : trxType === 'out' ? 'cth: untuk divisi operasional' : 'cth: selisih hitung rak'}
+                className={`${inputCls} mb-4`} />
+
+              {trxError && (
+                <div className="mb-4 bg-[#FFBEFB] border-[3px] border-[#241F31] text-[#241F31] text-sm font-bold rounded-2xl px-4 py-3 flex items-center gap-2">
+                  <AlertIcon className="w-5 h-5 flex-shrink-0" /> {trxError}
+                </div>
+              )}
+
+              <button onClick={submitTrx} disabled={trxLoading}
+                className={`nb-btn w-full font-black rounded-2xl py-4 disabled:opacity-60 ${TRX_TONE[trxType].btn}`}>
+                {trxLoading ? 'Menyimpan...' : TRX_TONE[trxType].label}
+              </button>
+            </div>
+          </div>
         </Modal>
       )}
 

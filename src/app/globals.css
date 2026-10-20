@@ -2,7 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; }
+:root {
+  --nb-ink: #241f31;
+  --nb-yellow: #fff4bf;
+  --nb-cream: #fff9e3;
+  --nb-pink: #ffbefb;
+  --nb-lilac: #dc95ff;
+  --nb-deep: #8c56d4;
+}
+
+body { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; background: var(--nb-cream); }
+
+/* ===== NEOBRUTALISM (soft) ===== */
+.nb-card {
+  background: #fff;
+  border: 3px solid var(--nb-ink);
+  border-radius: 20px;
+  box-shadow: 6px 6px 0 var(--nb-ink);
+}
+.nb-card-sm {
+  background: #fff;
+  border: 2.5px solid var(--nb-ink);
+  border-radius: 16px;
+  box-shadow: 4px 4px 0 var(--nb-ink);
+}
+.nb-btn {
+  border: 3px solid var(--nb-ink);
+  box-shadow: 4px 4px 0 var(--nb-ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.nb-btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--nb-ink); }
+.nb-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--nb-ink); }
+.nb-input {
+  border: 3px solid var(--nb-ink);
+  border-radius: 14px;
+  background: #fff;
+}
+.nb-input:focus { outline: none; box-shadow: 4px 4px 0 var(--nb-deep); }
+.nb-chip {
+  border: 2.5px solid var(--nb-ink);
+  box-shadow: 3px 3px 0 var(--nb-ink);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.nb-chip:active { transform: translate(3px, 3px); box-shadow: 0 0 0 var(--nb-ink); }
+.nb-badge {
+  border: 2.5px solid var(--nb-ink);
+  border-radius: 999px;
+}
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(12px); }

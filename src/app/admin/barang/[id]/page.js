@@ -36,24 +36,24 @@ export default function BarangDetail({ params }) {
 
   return (
     <div className="animate-fade-up">
-      <Link href="/admin/barang" className="inline-flex items-center gap-1 text-sm font-bold text-slate-500 hover:text-slate-800 mb-4">
+      <Link href="/admin/barang" className="nb-chip inline-flex items-center gap-1 text-sm font-extrabold text-[#241F31] bg-white px-3.5 py-2 rounded-xl mb-4">
         ← Kembali ke daftar barang
       </Link>
 
       {/* info barang */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6 mb-5">
+      <div className="nb-card p-5 sm:p-6 mb-5">
         <div className="flex items-start gap-4">
           {item.image ? (
             <img src={item.image} alt={item.name}
-              className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+              className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 border-[3px] border-[#241F31]" />
           ) : (
-            <span className="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0">
+            <span className="w-14 h-14 rounded-2xl bg-[#DC95FF] text-[#241F31] border-[3px] border-[#241F31] flex items-center justify-center flex-shrink-0">
               <BoxIcon className="w-7 h-7" />
             </span>
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-xl sm:text-2xl font-extrabold">{item.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-black">{item.name}</h1>
               <StatusBadge status={st} />
             </div>
             <p className="text-xs text-slate-400 font-mono mt-1">{item.sku}</p>
@@ -66,16 +66,16 @@ export default function BarangDetail({ params }) {
             { label: 'Kategori', value: item.category },
             { label: 'Lokasi rak', value: item.location || '—' },
           ].map((f) => (
-            <div key={f.label} className="bg-slate-50 rounded-2xl p-3.5">
+            <div key={f.label} className="bg-[#FFF9E3] border-[2.5px] border-[#241F31] rounded-2xl p-3.5">
               <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wide">{f.label}</p>
               <p className={`font-extrabold mt-1 tabular-nums ${f.big ? 'text-2xl' : ''}`}>{f.value}</p>
             </div>
           ))}
         </div>
         {st !== 'ok' && (
-          <div className={`mt-4 rounded-2xl p-4 flex items-center gap-3 ${st === 'empty' ? 'bg-red-50' : 'bg-amber-50'}`}>
-            <AlertIcon className={`w-6 h-6 flex-shrink-0 ${st === 'empty' ? 'text-red-500' : 'text-amber-500'}`} />
-            <p className={`text-sm font-bold ${st === 'empty' ? 'text-red-800' : 'text-amber-800'}`}>
+          <div className={`mt-4 rounded-2xl border-[3px] border-[#241F31] p-4 flex items-center gap-3 ${st === 'empty' ? 'bg-[#FFBEFB]' : 'bg-[#FFF4BF]'}`}>
+            <AlertIcon className={`w-6 h-6 flex-shrink-0 text-[#241F31]`} />
+            <p className={`text-sm font-extrabold text-[#241F31]`}>
               {st === 'empty' ? 'Stok habis. Segera restock barang ini.' : `Stok menipis (minimum ${item.minStock} ${item.unit}). Pertimbangkan restock.`}
             </p>
           </div>
@@ -83,15 +83,15 @@ export default function BarangDetail({ params }) {
       </div>
 
       {/* riwayat */}
-      <div className="bg-white rounded-3xl border border-slate-100 p-5 sm:p-6">
+      <div className="nb-card p-5 sm:p-6">
         <h2 className="font-extrabold text-lg mb-4">Riwayat Pergerakan Stok</h2>
         {history.length === 0 ? (
           <p className="text-sm text-slate-400 font-semibold text-center py-8">Belum ada transaksi untuk barang ini.</p>
         ) : (
           <div className="space-y-2">
             {history.map((t) => (
-              <div key={t._id} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50">
-                <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${t.type === 'in' ? 'bg-emerald-100 text-emerald-700' : t.type === 'out' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+              <div key={t._id} className="flex items-center gap-3 p-3 rounded-2xl bg-[#FFF9E3] border-2 border-[#241F31]/10">
+                <span className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${t.type === 'in' ? 'bg-[#FFF4BF] text-[#241F31]' : t.type === 'out' ? 'bg-[#FFBEFB] text-[#241F31]' : 'bg-[#DC95FF] text-[#241F31]'}`}>
                   {t.type === 'in' ? <ArrowUpIcon className="w-4 h-4" /> : t.type === 'out' ? <ArrowDownIcon className="w-4 h-4" /> : <AlertIcon className="w-4 h-4" />}
                 </span>
                 <div className="flex-1 min-w-0">

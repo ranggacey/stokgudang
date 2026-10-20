@@ -15,7 +15,7 @@ function Stepper({ value, onChange }) {
   return (
     <div className="flex items-center gap-3">
       <button type="button" onClick={() => onChange(Math.max(0, value - 1))}
-        className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-xl hover:bg-slate-200 active:scale-95 transition">−</button>
+        className="nb-chip w-12 h-12 rounded-2xl bg-[#FFBEFB] text-[#241F31] font-black text-xl">−</button>
       <input
         type="number" min="0" value={text}
         onFocus={(e) => { setFocused(true); e.target.select(); }}
@@ -25,10 +25,10 @@ function Stepper({ value, onChange }) {
           setText(t);
           onChange(t === '' ? 0 : parseInt(t, 10));
         }}
-        className="w-24 text-center text-2xl font-extrabold tabular-nums border border-slate-200 rounded-2xl py-2.5 outline-none focus:border-amber-500"
+        className="nb-input w-24 text-center text-2xl font-black tabular-nums py-2.5"
       />
       <button type="button" onClick={() => onChange(value + 1)}
-        className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-700 font-extrabold text-xl hover:bg-slate-200 active:scale-95 transition">+</button>
+        className="nb-chip w-12 h-12 rounded-2xl bg-white text-[#241F31] font-black text-xl">+</button>
     </div>
   );
 }
@@ -43,8 +43,8 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
   const [imageFile, setImageFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  const inputCls = 'w-full border border-slate-200 rounded-2xl px-4 py-3 text-sm font-semibold outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition';
-  const labelCls = 'block text-xs font-extrabold text-slate-500 uppercase tracking-wide mb-1.5';
+  const inputCls = 'nb-input w-full px-4 py-3 text-sm font-bold transition';
+  const labelCls = 'block text-xs font-extrabold text-[#241F31]/60 uppercase tracking-[0.18em] mb-1.5';
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -107,16 +107,16 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {errors._global && (
-        <div className="bg-red-50 border border-red-100 text-red-700 text-sm font-bold rounded-2xl px-4 py-3">{errors._global}</div>
+        <div className="bg-[#FFBEFB] border-[3px] border-[#241F31] text-[#241F31] text-sm font-bold rounded-2xl px-4 py-3">{errors._global}</div>
       )}
       {/* info barang */}
       <div>
-        <p className="text-[11px] font-extrabold tracking-[0.18em] text-amber-600 uppercase mb-3">Info barang</p>
+        <p className="text-[11px] font-extrabold tracking-[0.18em] text-[#8C56D4] uppercase mb-3">Info barang</p>
         <div className="space-y-4">
           {/* foto barang */}
           <div className="flex items-center gap-4">
             <button type="button" onClick={() => fileInputRef.current?.click()}
-              className="w-20 h-20 rounded-3xl bg-slate-100 border-2 border-dashed border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0 hover:border-amber-400 transition">
+              className="w-20 h-20 rounded-3xl bg-[#DC95FF] border-[3px] border-dashed border-[#241F31] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-[4px_4px_0_#241F31]">
               {(imageFile || form.image) ? (
                 <img
                   src={imageFile ? URL.createObjectURL(imageFile) : form.image}
@@ -124,7 +124,7 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-slate-400 flex flex-col items-center gap-1">
+                <span className="text-[#241F31] flex flex-col items-center gap-1">
                   <CameraIcon className="w-6 h-6" />
                   <span className="text-[9px] font-extrabold uppercase tracking-wide">Foto</span>
                 </span>
@@ -135,12 +135,12 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
               <p className="text-xs text-slate-400 font-semibold mt-0.5">JPG/PNG, maks 5MB. Muncul di katalog publik.</p>
               <div className="flex gap-2 mt-2">
                 <button type="button" onClick={() => fileInputRef.current?.click()}
-                  className="px-3.5 py-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold hover:bg-slate-800 transition">
+                  className="nb-chip px-3.5 py-2 rounded-xl bg-[#241F31] text-white text-xs font-extrabold">
                   {imageFile || form.image ? 'Ganti foto' : 'Pilih foto'}
                 </button>
                 {(imageFile || form.image) && (
                   <button type="button" onClick={() => { setImageFile(null); setForm({ ...form, image: '' }); }}
-                    className="px-3.5 py-2 rounded-xl bg-red-50 text-red-600 text-xs font-extrabold hover:bg-red-100 transition">
+                    className="nb-chip px-3.5 py-2 rounded-xl bg-[#FFBEFB] text-[#241F31] text-xs font-extrabold">
                     Hapus
                   </button>
                 )}
@@ -174,7 +174,7 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
       </div>
       {/* stok & lokasi */}
       <div>
-        <p className="text-[11px] font-extrabold tracking-[0.18em] text-amber-600 uppercase mb-3">Stok & lokasi</p>
+        <p className="text-[11px] font-extrabold tracking-[0.18em] text-[#8C56D4] uppercase mb-3">Stok & lokasi</p>
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className={labelCls}>Satuan</label>
@@ -202,18 +202,18 @@ export default function ItemForm({ initial, categories = [], mode = 'add', itemI
         </div>
       </div>
       {mode === 'add' && (
-        <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-4">
+        <div className="bg-[#FFF4BF] border-[3px] border-[#241F31] rounded-3xl p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-extrabold text-emerald-900">Stok awal</p>
-              <p className="text-xs text-emerald-700/80 font-semibold mt-0.5">Otomatis tercatat sebagai transaksi masuk</p>
+              <p className="text-sm font-extrabold text-[#241F31]">Stok awal</p>
+              <p className="text-xs text-[#241F31]/60 font-semibold mt-0.5">Otomatis tercatat sebagai transaksi masuk</p>
             </div>
             <Stepper value={form.initialStock} onChange={(v) => setForm({ ...form, initialStock: v })} />
           </div>
         </div>
       )}
       <button type="submit" disabled={loading}
-        className="w-full bg-slate-900 text-white font-extrabold rounded-2xl py-4 hover:bg-slate-800 active:scale-[0.99] transition disabled:opacity-60 shadow-lg">
+        className="nb-btn w-full bg-[#8C56D4] text-white font-black rounded-2xl py-4 disabled:opacity-60">
         {loading ? (uploading ? 'Mengupload foto...' : 'Menyimpan...') : mode === 'edit' ? 'Simpan Perubahan' : 'Tambah Barang'}
       </button>
     </form>

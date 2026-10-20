@@ -9,12 +9,12 @@ export const STATUS_LABEL = { ok: 'Tersedia', low: 'Menipis', empty: 'Habis' };
 
 export function StatusBadge({ status, className = '' }) {
   const styles = {
-    ok: 'bg-emerald-100 text-emerald-700',
-    low: 'bg-amber-100 text-amber-700',
-    empty: 'bg-red-100 text-red-700',
+    ok: 'bg-[#FFF4BF] text-[#241F31]',
+    low: 'bg-[#DC95FF] text-[#241F31]',
+    empty: 'bg-[#FFBEFB] text-[#241F31]',
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold ${styles[status]} ${className}`}>
+    <span className={`nb-badge inline-flex items-center px-3 py-1 text-xs font-extrabold ${styles[status]} ${className}`}>
       {STATUS_LABEL[status]}
     </span>
   );
@@ -24,12 +24,12 @@ export const TYPE_LABEL = { in: 'Masuk', out: 'Keluar', adjust: 'Penyesuaian' };
 
 export function TypeBadge({ type, className = '' }) {
   const styles = {
-    in: 'bg-emerald-100 text-emerald-700',
-    out: 'bg-red-100 text-red-700',
-    adjust: 'bg-amber-100 text-amber-700',
+    in: 'bg-[#FFF4BF] text-[#241F31]',
+    out: 'bg-[#FFBEFB] text-[#241F31]',
+    adjust: 'bg-[#DC95FF] text-[#241F31]',
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold ${styles[type]} ${className}`}>
+    <span className={`nb-badge inline-flex items-center px-3 py-1 text-xs font-extrabold ${styles[type]} ${className}`}>
       {TYPE_LABEL[type]}
     </span>
   );

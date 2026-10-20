@@ -1,4 +1,4 @@
-function Base({ className = '', children, strokeWidth = 1.8 }) {
+function Base({ className = '', children, strokeWidth = 2.4 }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

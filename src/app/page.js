@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BoxIcon, SearchIcon } from '@/components/icons';
 import { stockStatus, StatusBadge } from '@/components/badges';
 
@@ -12,16 +12,16 @@ const SORTS = [
 ];
 
 const STATUS_FILTERS = [
-  { v: '', label: 'Semua' },
-  { v: 'available', label: 'Tersedia' },
-  { v: 'low', label: 'Menipis' },
-  { v: 'empty', label: 'Habis' },
+  { v: '', label: 'Semua', bg: '#fff' },
+  { v: 'available', label: 'Tersedia', bg: '#FFF4BF' },
+  { v: 'low', label: 'Menipis', bg: '#DC95FF' },
+  { v: 'empty', label: 'Habis', bg: '#FFBEFB' },
 ];
 
-const STATUS_TONE = {
-  ok: 'border-l-emerald-400',
-  low: 'border-l-amber-400',
-  empty: 'border-l-red-400',
+const STATUS_TILE = {
+  ok: 'bg-[#FFF4BF]',
+  low: 'bg-[#DC95FF]',
+  empty: 'bg-[#FFBEFB]',
 };
 
 export default function PublicCatalog() {
@@ -32,22 +32,26 @@ export default function PublicCatalog() {
   const [category, setCategory] = useState('');
   const [sort, setSort] = useState('name_asc');
   const [status, setStatus] = useState('');
+  const abortRef = useRef(null);
 
   useEffect(() => {
-    const t = setTimeout(fetchItems, 300);
+    const t = setTimeout(fetchItems, 120);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, category, sort, status]);
 
   async function fetchItems() {
-    setLoading(true);
+    abortRef.current?.abort();
+    const ctl = new AbortController();
+    abortRef.current = ctl;
     try {
       const p = new URLSearchParams({ q, category, sort, status });
-      const r = await fetch(`/api/items?${p}`);
+      const r = await fetch(`/api/items?${p}`, { signal: ctl.signal });
       const d = await r.json();
       setItems(d.items || []);
       setCategories(d.categories || []);
     } catch (e) {
-      console.error(e);
+      if (e.name !== 'AbortError') console.error(e);
     } finally {
       setLoading(false);
     }
@@ -61,37 +65,31 @@ export default function PublicCatalog() {
   };
 
   const statCards = [
-    { label: 'Jenis barang', value: counts.total, icon: <BoxIcon className="w-5 h-5" />, tile: 'bg-slate-900 text-amber-400' },
-    { label: 'Tersedia', value: counts.ok, icon: <BoxIcon className="w-5 h-5" />, tile: 'bg-emerald-500 text-white' },
-    { label: 'Menipis', value: counts.low, icon: <BoxIcon className="w-5 h-5" />, tile: 'bg-amber-400 text-slate-900' },
-    { label: 'Habis', value: counts.empty, icon: <BoxIcon className="w-5 h-5" />, tile: 'bg-red-500 text-white' },
+    { label: 'Jenis barang', value: counts.total, icon: <BoxIcon className="w-6 h-6" />, bg: 'bg-white' },
+    { label: 'Tersedia', value: counts.ok, icon: <BoxIcon className="w-6 h-6" />, bg: 'bg-[#FFF4BF]' },
+    { label: 'Menipis', value: counts.low, icon: <BoxIcon className="w-6 h-6" />, bg: 'bg-[#DC95FF]' },
+    { label: 'Habis', value: counts.empty, icon: <BoxIcon className="w-6 h-6" />, bg: 'bg-[#FFBEFB]' },
   ];
 
   return (
-    <div className="min-h-screen bg-[#F6F7FB]">
+    <div className="min-h-screen bg-[#FFF9E3] text-[#241F31]">
       {/* ===== HERO ===== */}
-      <header className="relative overflow-hidden bg-slate-950 text-white">
-        <div className="absolute -top-40 -right-40 w-[480px] h-[480px] bg-amber-500/25 rounded-full blur-3xl" />
-        <div className="absolute -bottom-48 -left-32 w-[420px] h-[420px] bg-amber-400/10 rounded-full blur-3xl" />
-        <div
-          className="absolute inset-0 opacity-[0.12]"
-          style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.5) 1px, transparent 0)',
-            backgroundSize: '26px 26px',
-          }}
-        />
+      <header className="relative overflow-hidden bg-[#8C56D4] border-b-[3px] border-[#241F31] text-white">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#FFBEFB] rounded-full border-[3px] border-[#241F31]" />
+        <div className="absolute -bottom-32 -left-20 w-80 h-80 bg-[#DC95FF] rounded-full border-[3px] border-[#241F31] opacity-80" />
+        <div className="absolute top-10 right-1/4 w-16 h-16 bg-[#FFF4BF] rotate-12 border-[3px] border-[#241F31] rounded-2xl hidden sm:block" />
         <div className="relative max-w-6xl mx-auto px-4 pt-10 pb-16 sm:pt-14 sm:pb-20">
           <div className="flex items-center gap-3">
-            <span className="w-12 h-12 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/40">
+            <span className="w-12 h-12 rounded-2xl bg-[#FFF4BF] text-[#241F31] border-[3px] border-[#241F31] shadow-[4px_4px_0_#241F31] flex items-center justify-center">
               <BoxIcon className="w-7 h-7" />
             </span>
-            <p className="text-[11px] font-extrabold tracking-[0.28em] text-amber-400 uppercase">Gudang · Real-time</p>
+            <p className="text-[11px] font-extrabold tracking-[0.28em] text-[#FFF4BF] uppercase">Gudang · Real-time</p>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold leading-[1.05] mt-5 max-w-xl">
+          <h1 className="text-4xl sm:text-6xl font-black leading-[1.02] mt-5 max-w-xl drop-shadow-[3px_3px_0_rgba(36,31,49,0.45)]">
             Stok Gudang,<br />
-            <span className="text-amber-400">terpantau</span> setiap saat.
+            <span className="bg-[#FFF4BF] text-[#241F31] px-3 rounded-xl border-[3px] border-[#241F31] inline-block mt-2 -rotate-1">terpantau</span> setiap saat.
           </h1>
-          <p className="text-slate-400 text-sm sm:text-base mt-3 max-w-md leading-relaxed">
+          <p className="text-white/90 text-sm sm:text-base mt-4 max-w-md leading-relaxed font-semibold">
             Cek ketersediaan barang secara langsung. Data diperbarui otomatis setiap ada barang masuk atau keluar.
           </p>
         </div>
@@ -100,35 +98,36 @@ export default function PublicCatalog() {
       <main className="max-w-6xl mx-auto px-4 pb-8">
         {/* search mengambang */}
         <div className="relative z-10 -mt-7 mb-7 max-w-xl">
-          <SearchIcon className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <SearchIcon className="w-6 h-6 absolute left-5 top-1/2 -translate-y-1/2 text-[#241F31]" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Cari nama barang atau kode..."
-            className="w-full bg-white rounded-2xl pr-5 py-4 text-slate-900 text-[15px] font-semibold placeholder:text-slate-400 placeholder:font-medium outline-none shadow-xl shadow-slate-900/10 border border-slate-100 focus:border-amber-400 focus:ring-4 focus:ring-amber-100 transition"
-            style={{ paddingLeft: '3.25rem' }}
+            className="nb-input w-full pr-5 py-4 text-[#241F31] text-[15px] font-bold placeholder:text-[#241F31]/40 shadow-[5px_5px_0_#241F31]"
+            style={{ paddingLeft: '3.5rem' }}
           />
         </div>
+
         {/* ===== STATS ===== */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-7 animate-fade-up">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7 animate-fade-up">
           {statCards.map((s) => (
-            <div key={s.label} className="bg-white rounded-3xl border border-slate-100 p-4 flex items-center gap-3.5 shadow-sm">
-              <span className={`w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 ${s.tile}`}>{s.icon}</span>
+            <div key={s.label} className={`nb-card-sm p-4 flex items-center gap-3.5 ${s.bg}`}>
+              <span className="w-12 h-12 rounded-2xl bg-[#241F31] text-[#FFF4BF] border-[2.5px] border-[#241F31] flex items-center justify-center flex-shrink-0">{s.icon}</span>
               <div>
-                <p className="text-2xl font-extrabold tabular-nums leading-none">{s.value}</p>
-                <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wide mt-1">{s.label}</p>
+                <p className="text-2xl font-black tabular-nums leading-none">{s.value}</p>
+                <p className="text-[11px] font-extrabold uppercase tracking-wide mt-1">{s.label}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* ===== FILTER ===== */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 mb-6">
-          <div className="flex gap-2.5 flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
+          <div className="flex gap-3 flex-1">
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold outline-none focus:border-amber-500 cursor-pointer"
+              className="nb-input flex-1 sm:flex-none px-4 py-3 text-sm font-extrabold outline-none cursor-pointer"
             >
               <option value="">Semua kategori</option>
               {categories.map((c) => (
@@ -138,22 +137,21 @@ export default function PublicCatalog() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
-              className="flex-1 sm:flex-none px-4 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold outline-none focus:border-amber-500 cursor-pointer"
+              className="nb-input flex-1 sm:flex-none px-4 py-3 text-sm font-extrabold outline-none cursor-pointer"
             >
               {SORTS.map((s) => (
                 <option key={s.v} value={s.v}>{s.label}</option>
               ))}
             </select>
           </div>
-          <div className="flex gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex gap-2.5 overflow-x-auto pb-1 sm:pb-0">
             {STATUS_FILTERS.map((f) => (
               <button
                 key={f.v}
                 onClick={() => setStatus(f.v)}
-                className={`px-4 py-3 rounded-2xl text-xs font-extrabold whitespace-nowrap transition-all ${
-                  status === f.v
-                    ? 'bg-slate-900 text-white shadow-md'
-                    : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-300'
+                style={status === f.v ? undefined : { background: f.bg }}
+                className={`nb-chip px-4 py-2.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all ${
+                  status === f.v ? 'bg-[#241F31] text-white' : 'text-[#241F31]'
                 }`}
               >
                 {f.label}
@@ -163,53 +161,47 @@ export default function PublicCatalog() {
         </div>
 
         {/* ===== LIST ===== */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        {loading && items.length === 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-3xl border border-slate-100 p-5 animate-pulse">
-                <div className="h-4 bg-slate-100 rounded-full w-2/3 mb-3" />
-                <div className="h-3 bg-slate-100 rounded-full w-1/3" />
+              <div key={i} className="nb-card p-5 animate-pulse">
+                <div className="h-4 bg-[#FFF4BF] border-2 border-[#241F31]/10 rounded-full w-2/3 mb-3" />
+                <div className="h-3 bg-[#FFBEFB]/60 rounded-full w-1/3" />
               </div>
             ))}
           </div>
         ) : items.length === 0 ? (
-          <div className="bg-white rounded-3xl border border-slate-100 p-14 text-center">
-            <span className="inline-flex w-16 h-16 rounded-3xl bg-slate-100 text-slate-300 items-center justify-center mb-4">
+          <div className="nb-card p-14 text-center bg-white">
+            <span className="inline-flex w-16 h-16 rounded-2xl bg-[#DC95FF] border-[3px] border-[#241F31] shadow-[4px_4px_0_#241F31] text-[#241F31] items-center justify-center mb-4">
               <BoxIcon className="w-8 h-8" />
             </span>
-            <p className="font-extrabold text-slate-600">Tidak ada barang yang cocok</p>
-            <p className="text-sm text-slate-400 mt-1">Coba ubah kata kunci atau filter</p>
+            <p className="font-extrabold text-lg">Tidak ada barang yang cocok</p>
+            <p className="text-sm font-semibold opacity-60 mt-1">Coba ubah kata kunci atau filter</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {items.map((item) => {
               const st = stockStatus(item);
               const isEmpty = st === 'empty';
               return (
                 <div
                   key={item._id}
-                  className={`group bg-white rounded-3xl border border-slate-100 border-l-4 ${STATUS_TONE[st]} p-5 flex items-center gap-4 transition-all hover:shadow-lg hover:shadow-slate-200/60 hover:-translate-y-0.5 ${
-                    isEmpty ? 'opacity-80' : ''
-                  }`}
+                  className={`nb-card p-5 flex items-center gap-4 transition-transform hover:-translate-y-1 ${isEmpty ? 'opacity-80' : ''}`}
                 >
                   {item.image ? (
                     <img src={item.image} alt={item.name}
-                      className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 border border-slate-100" />
+                      className="w-16 h-16 rounded-2xl object-cover flex-shrink-0 border-[3px] border-[#241F31]" />
                   ) : (
-                    <span className={`p-3.5 rounded-2xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                      isEmpty ? 'bg-slate-100 text-slate-400' : st === 'low' ? 'bg-amber-100 text-amber-700' : 'bg-slate-900 text-amber-400'
-                    }`}>
-                      <BoxIcon className="w-6 h-6" />
+                    <span className={`w-16 h-16 rounded-2xl border-[3px] border-[#241F31] flex items-center justify-center flex-shrink-0 ${STATUS_TILE[st]}`}>
+                      <BoxIcon className="w-7 h-7" />
                     </span>
                   )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-extrabold truncate text-[15px]">{item.name}</h3>
-                    <p className="text-[11px] text-slate-400 font-mono mt-0.5">{item.sku} · {item.category}</p>
+                    <p className="text-[11px] opacity-50 font-mono mt-0.5">{item.sku} · {item.category}</p>
                     <div className="flex items-center gap-2 mt-2.5">
-                      <span className={`text-xl font-extrabold tabular-nums ${isEmpty ? 'text-slate-400' : 'text-slate-900'}`}>
-                        {item.stock}
-                      </span>
-                      <span className="text-xs text-slate-400 font-semibold">{item.unit}</span>
+                      <span className="text-xl font-black tabular-nums">{item.stock}</span>
+                      <span className="text-xs opacity-50 font-bold">{item.unit}</span>
                       <span className="ml-auto"><StatusBadge status={st} /></span>
                     </div>
                   </div>
@@ -220,7 +212,7 @@ export default function PublicCatalog() {
         )}
 
         <footer className="text-center mt-12 pb-4">
-          <p className="text-xs text-slate-400 font-semibold">Data stok diperbarui otomatis oleh admin gudang</p>
+          <p className="text-xs font-bold opacity-50">Data stok diperbarui otomatis oleh admin gudang</p>
         </footer>
       </main>
     </div>
